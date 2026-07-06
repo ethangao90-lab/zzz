@@ -1,0 +1,5632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>航旅纵横机票大搜页 - 商旅速通 UE</title>
+  <style>
+    :root {
+      --bg: #eef2f7;
+      --panel: #ffffff;
+      --ink: #15284b;
+      --muted: #71809a;
+      --subtle: #eef3fb;
+      --line: #d9e3f2;
+      --blue: #2f5fb9;
+      --blue-deep: #193f8f;
+      --blue-soft: #eaf2ff;
+      --green: #20a56b;
+      --orange: #f08a32;
+      --danger: #d85757;
+      --shadow: 0 18px 50px rgba(27, 48, 90, 0.16);
+      font-family: "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(74, 126, 220, 0.18), transparent 30rem),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 38%, #e6ebf4 100%);
+    }
+
+    button {
+      border: 0;
+      font: inherit;
+      color: inherit;
+      background: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      display: flex;
+      justify-content: center;
+      width: min(480px, 100vw);
+      min-height: 100vh;
+      margin: 0 auto;
+    }
+
+    .phone-shell {
+      position: relative;
+      width: 100%;
+      flex: 0 0 auto;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .phone {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      border-radius: 0;
+      background: #f6f8fc;
+    }
+
+    .phone-scroll {
+      height: 100%;
+      overflow-y: auto;
+      padding-bottom: 104px;
+      scrollbar-width: none;
+    }
+
+    .phone-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .phone.figma-cards .status,
+    .phone.figma-cards .hero,
+    .phone.figma-cards .search-card,
+    .phone.figma-cards .quick-tools,
+    .phone.figma-cards .persona-module {
+      display: none;
+    }
+
+    .phone.figma-cards .phone-scroll {
+      overflow-y: visible;
+      padding-top: 16px;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 36px;
+      padding: 0 18px;
+      color: #fff;
+      background: linear-gradient(90deg, #143c8d, #2c86c9);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .hero {
+      position: relative;
+      height: 188px;
+      padding: 24px 20px 0;
+      color: #fff;
+      background:
+        radial-gradient(circle at 82% 18%, rgba(255,255,255,0.28), transparent 82px),
+        radial-gradient(circle at 78% 82%, rgba(255,255,255,0.28), transparent 64px),
+        linear-gradient(138deg, #113579 0%, #2464bd 58%, #43b8df 100%);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.22;
+      background:
+        linear-gradient(rgba(255,255,255,0.22) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .direct-badge {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      margin-top: 18px;
+      padding: 9px 14px;
+      border-radius: 20px;
+      background: linear-gradient(90deg, #ff9e41, #ffb15d);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .search-card {
+      position: relative;
+      z-index: 2;
+      margin: -18px 16px 12px;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: 0 8px 22px rgba(28, 61, 120, 0.12);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin-bottom: 16px;
+      color: #8a96ac;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .tabs b {
+      color: #1aa861;
+    }
+
+    .trip-type {
+      display: flex;
+      width: 164px;
+      margin: 0 auto 20px;
+      padding: 4px;
+      border-radius: 18px;
+      background: #f0f3f8;
+      color: #9aa4b5;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .trip-type span {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 15px;
+    }
+
+    .trip-type .active {
+      color: #26385c;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(30, 50, 90, 0.08);
+    }
+
+    .route-row {
+      display: grid;
+      grid-template-columns: 1fr 44px 1fr;
+      align-items: center;
+      gap: 10px;
+      padding: 2px 2px 16px;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 28px;
+      font-weight: 500;
+    }
+
+    .swap {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      color: var(--green);
+      background: #eefaf4;
+      font-size: 18px;
+    }
+
+    .date-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 14px 2px;
+      color: #2b3a58;
+      font-size: 14px;
+    }
+
+    .search-options {
+      display: flex;
+      justify-content: space-between;
+      color: #77839a;
+      font-size: 12px;
+    }
+
+    .main-passenger-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px 2px 12px;
+      border-top: 1px solid #eef2f7;
+      border-bottom: 1px solid #eef2f7;
+      color: #20375e;
+      background: transparent;
+      text-align: left;
+    }
+
+    .main-passenger-copy {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .main-passenger-copy strong {
+      overflow: hidden;
+      color: #1d2d4d;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .main-passenger-copy span {
+      overflow: hidden;
+      color: #16a260;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .main-passenger-row.selected .main-passenger-copy span {
+      color: #6f7f98;
+    }
+
+    .main-passenger-chevron {
+      flex: 0 0 auto;
+      color: #53647d;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .search-cta {
+      display: grid;
+      grid-template-columns: 1fr 58px;
+      gap: 10px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .search-cta .primary {
+      height: 48px;
+      border-radius: 24px;
+      color: #fff;
+      background: linear-gradient(90deg, #ffb55e, #ff873a);
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(255, 132, 54, 0.22);
+    }
+
+    .ai-btn {
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border-radius: 27px;
+      color: #fff;
+      background: linear-gradient(160deg, #2e63be, #223a93);
+      font-size: 11px;
+      box-shadow: 0 8px 16px rgba(35, 59, 145, 0.26);
+    }
+
+    .quick-tools {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 0 16px 12px;
+      padding: 10px;
+      border-radius: 18px;
+      background: #fff;
+      border: 1px solid #dfe8f4;
+      box-shadow: 0 6px 14px rgba(28, 61, 120, 0.06);
+    }
+
+    .quick-tools button {
+      display: grid;
+      place-items: center;
+      gap: 6px;
+      min-height: 64px;
+      border: 1px solid #dce6f5;
+      border-radius: 15px;
+      color: #2d539c;
+      background: linear-gradient(180deg, #fbfdff 0%, #f5f9ff 100%);
+      font-size: 11px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .bottom-nav i,
+    .persona i {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      background: #edf4ff;
+      font-style: normal;
+    }
+
+    .tool-icon {
+      position: relative;
+      display: block;
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      color: #2f5fb9;
+      background: #edf4ff;
+    }
+
+    .tool-icon::before,
+    .tool-icon::after {
+      content: "";
+      position: absolute;
+      box-sizing: border-box;
+      border-color: currentColor;
+    }
+
+    .tool-icon.ticket::before {
+      left: 6px;
+      top: 9px;
+      width: 16px;
+      height: 11px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+    }
+
+    .tool-icon.ticket::after {
+      left: 12px;
+      top: 7px;
+      height: 15px;
+      border-left: 2px dashed currentColor;
+    }
+
+    .tool-icon.receipt::before {
+      left: 8px;
+      top: 5px;
+      width: 12px;
+      height: 18px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .tool-icon.receipt::after {
+      left: 11px;
+      top: 11px;
+      width: 7px;
+      height: 6px;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+    }
+
+    .tool-icon.upgrade::before {
+      left: 13px;
+      top: 7px;
+      height: 15px;
+      border-left: 2px solid currentColor;
+    }
+
+    .tool-icon.upgrade::after {
+      left: 9px;
+      top: 7px;
+      width: 10px;
+      height: 10px;
+      border-top: 2px solid currentColor;
+      border-left: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .tool-icon.seat::before {
+      left: 7px;
+      top: 10px;
+      width: 14px;
+      height: 9px;
+      border: 2px solid currentColor;
+      border-radius: 4px 4px 6px 6px;
+    }
+
+    .tool-icon.seat::after {
+      left: 9px;
+      top: 7px;
+      width: 10px;
+      height: 7px;
+      border: 2px solid currentColor;
+      border-bottom: 0;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .tool-icon.luggage::before {
+      left: 8px;
+      top: 9px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+    }
+
+    .tool-icon.luggage::after {
+      left: 11px;
+      top: 5px;
+      width: 7px;
+      height: 6px;
+      border: 2px solid currentColor;
+      border-bottom: 0;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .tool-icon.group::before {
+      left: 8px;
+      top: 7px;
+      width: 6px;
+      height: 6px;
+      border: 2px solid currentColor;
+      border-radius: 50%;
+      box-shadow: 8px 0 0 -1px #edf4ff, 8px 0 0 1px currentColor;
+    }
+
+    .tool-icon.group::after {
+      left: 7px;
+      top: 16px;
+      width: 16px;
+      height: 7px;
+      border: 2px solid currentColor;
+      border-radius: 8px 8px 3px 3px;
+    }
+
+    .tool-icon.more::before {
+      left: 8px;
+      top: 8px;
+      width: 4px;
+      height: 4px;
+      border-radius: 2px;
+      background: currentColor;
+      box-shadow: 8px 0 currentColor, 0 8px currentColor, 8px 8px currentColor;
+    }
+
+    .persona-nav {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      margin: 0 16px 10px;
+      padding: 2px 0 6px;
+      scrollbar-width: none;
+    }
+
+    .persona-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .persona-module {
+      margin: 0 16px 12px;
+      padding: 12px 12px 10px;
+      border: 1px solid #dce7f6;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 18px rgba(31, 67, 132, 0.06);
+      overflow: hidden;
+    }
+
+    .persona-section-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
+      margin: 0 0 10px;
+    }
+
+    .persona-section-head h2 {
+      flex: 0 0 auto;
+      margin: 0;
+      color: #18345f;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 0;
+      line-height: 1.25;
+    }
+
+    .persona-section-head p {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+      color: #718198;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .persona-module .persona-nav {
+      gap: 6px;
+      margin: 0;
+      padding: 0 0 2px;
+    }
+
+    .persona {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex: 0 0 calc((100% - 18px) / 4);
+      min-width: 0;
+      padding: 7px 5px;
+      border: 1px solid #dbe5f3;
+      border-radius: 22px;
+      color: #65738c;
+      background: #fff;
+      font-size: 12px;
+      box-shadow: 0 3px 8px rgba(28, 61, 120, 0.05);
+    }
+
+    .persona span {
+      min-width: 0;
+    }
+
+    .persona i {
+      flex: 0 0 22px;
+      width: 22px;
+      height: 22px;
+      border-radius: 7px;
+    }
+
+    .persona strong {
+      display: block;
+      color: #2b3a58;
+      font-size: 12px;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+
+    .persona small {
+      display: block;
+      margin-top: 2px;
+      font-size: 9px;
+      color: #8b96aa;
+      white-space: nowrap;
+    }
+
+    .persona.active {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(135deg, #3567bf, #3baed1);
+    }
+
+    .persona.active strong,
+    .persona.active small {
+      color: #fff;
+    }
+
+    .persona.active i {
+      color: #2360bd;
+      background: rgba(255,255,255,0.88);
+    }
+
+    .business-card {
+      margin: 0 16px 14px;
+      border: 1px solid #cbd8ec;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(31, 67, 132, 0.08);
+      overflow: hidden;
+    }
+
+    .persona-card-list {
+      display: grid;
+      gap: 12px;
+      margin: 0 16px 14px;
+    }
+
+    .persona-card-list .business-card {
+      margin: 0;
+    }
+
+    .persona-stack-card {
+      position: relative;
+    }
+
+    .business-card header {
+      padding: 10px 12px 0;
+      background: #fff;
+    }
+
+    .business-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 7px;
+    }
+
+    .avatar-slot {
+      display: grid;
+      place-items: center;
+      min-height: 78px;
+      border: 1px solid #d4e0f0;
+      border-radius: 14px;
+      background: #f3f7fd;
+    }
+
+    .avatar-illustration {
+      display: block;
+      width: 52px;
+      height: 64px;
+    }
+
+    .role-avatar {
+      color: #2f5fb9;
+      background:
+        radial-gradient(circle at 72% 18%, rgba(47,95,185,0.12), transparent 28px),
+        #f3f7fd;
+    }
+
+    .role-avatar span {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      color: #fff;
+      background: linear-gradient(135deg, #3567bf, #3baed1);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .family-avatar {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(160deg, #eef7ff 0%, #dff4ff 100%);
+      box-shadow: inset 0 0 0 1px rgba(47, 95, 185, 0.08);
+    }
+
+    .family-avatar .adult-head,
+    .family-avatar .child-head {
+      position: absolute;
+      border-radius: 50%;
+      background: #ffd9b3;
+      box-shadow: inset 0 3px 0 rgba(31, 54, 94, 0.14);
+    }
+
+    .family-avatar .adult-head {
+      width: 19px;
+      height: 19px;
+      left: 17px;
+      top: 14px;
+    }
+
+    .family-avatar .child-head {
+      width: 15px;
+      height: 15px;
+      right: 15px;
+      top: 21px;
+    }
+
+    .family-avatar .adult-body,
+    .family-avatar .child-body {
+      position: absolute;
+      border-radius: 12px 12px 7px 7px;
+      background: #2f5fb9;
+    }
+
+    .family-avatar .adult-body {
+      width: 24px;
+      height: 25px;
+      left: 14px;
+      top: 32px;
+    }
+
+    .family-avatar .child-body {
+      width: 20px;
+      height: 20px;
+      right: 12px;
+      top: 37px;
+      background: #34a7c9;
+    }
+
+    .family-avatar .heart {
+      position: absolute;
+      left: 38px;
+      top: 12px;
+      color: #2bb673;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .module-title {
+      min-width: 0;
+    }
+
+    .module-title h2 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .profile-row {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 9px;
+      align-items: stretch;
+      padding-bottom: 8px;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 4px;
+      align-content: center;
+    }
+
+    .summary-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 20px;
+      padding: 3px 8px;
+      border-radius: 9px;
+      background: #f7faff;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+    .summary-line b {
+      flex: 0 0 auto;
+      color: #62728d;
+      font-weight: 700;
+    }
+
+    .summary-line span {
+      min-width: 0;
+      color: #20375e;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .summary-line[role="button"] {
+      cursor: pointer;
+    }
+
+    .summary-line[role="button"] span::after {
+      content: "›";
+      margin-left: 3px;
+      color: #8a9ab0;
+    }
+
+    .summary-line span.summary-status {
+      flex: 1 1 auto;
+      overflow: hidden;
+      padding: 1px 6px;
+      border-radius: 9px;
+      font-size: 10px;
+      line-height: 1.4;
+      text-overflow: ellipsis;
+    }
+
+    .summary-line span.summary-status.ready {
+      color: #12823a;
+      background: #e8f8ee;
+    }
+
+    .summary-line span.summary-status.warning {
+      color: #b26000;
+      background: #fff3df;
+    }
+
+    .summary-line span.summary-status.neutral {
+      color: #6f7d92;
+      background: #eef3f8;
+    }
+
+    .ue-section {
+      padding: 8px 12px;
+      border-top: 1px solid #edf2f8;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .section-head small {
+      color: #7c8aa3;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .link-btn {
+      padding: 5px 10px;
+      border: 1px solid #c8d7ed;
+      border-radius: 15px;
+      color: var(--blue);
+      background: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .compact-section {
+      display: grid;
+      gap: 5px;
+    }
+
+    .compact-title {
+      color: #1f365e;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .pref-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .pref-row.selectable {
+      align-items: center;
+    }
+
+    .pref-chip-toggle,
+    .more-pref-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 26px;
+      padding: 4px 9px;
+      border: 1px solid #d4e1f1;
+      border-radius: 13px;
+      color: #536a86;
+      background: #fbfdff;
+      font-size: 10.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .pref-chip-toggle.selected {
+      border-color: #8eb5ee;
+      color: #2055a2;
+      background: #eef5ff;
+    }
+
+    .pref-chip-toggle.selected::before {
+      content: "✓";
+      display: grid;
+      width: 14px;
+      height: 14px;
+      place-items: center;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--green);
+      font-size: 9px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .more-pref-link {
+      border-color: transparent;
+      color: var(--blue);
+      background: transparent;
+      padding-right: 0;
+    }
+
+    .ready-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .ready-item {
+      min-width: 0;
+      min-height: 38px;
+      padding: 6px 5px;
+      border: 1px solid #d8e5f4;
+      border-radius: 9px;
+      background: #fbfdff;
+      display: flex;
+      align-items: center;
+    }
+
+    .ready-main {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .ready-check {
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--green);
+      display: inline-grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .ready-main strong {
+      min-width: 0;
+      color: #20375e;
+      font-size: 10px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ready-badge {
+      flex: 0 0 auto;
+      padding: 2px 4px;
+      border-radius: 9px;
+      color: #12823a;
+      background: #e8f8ee;
+      font-size: 8px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .ready-item.warning {
+      border-color: #f1d3a4;
+      background: #fffaf1;
+    }
+
+    .ready-check.warning,
+    .ready-badge.warning {
+      color: #fff;
+      background: #f0a33b;
+    }
+
+    .ready-item.neutral {
+      border-color: #dce5f1;
+      background: #f8fbff;
+    }
+
+    .ready-check.neutral {
+      color: #66809f;
+      background: #e8eef7;
+    }
+
+    .ready-badge.neutral {
+      color: #4f6580;
+      background: #edf3fa;
+    }
+
+    .strategy-row,
+    .route-chips {
+      display: flex;
+      gap: 6px;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border: 1px solid #cfdcf0;
+      border-radius: 14px;
+      color: #244577;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .chip.strategy {
+      gap: 5px;
+      min-height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      color: #405878;
+      background: transparent;
+      font-weight: 700;
+      pointer-events: none;
+    }
+
+    .chip.strategy::before {
+      content: "";
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #97a7bf;
+    }
+
+    .pref-row .chip {
+      flex: 0 0 auto;
+      font-size: 11px;
+    }
+
+    .pref-note {
+      color: #7c8aa3;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    .route-chip {
+      flex: 0 0 auto;
+      min-width: auto;
+      justify-content: center;
+    }
+
+    .route-chip.active {
+      border-color: #94b6ea;
+      color: #2055a2;
+      background: #eef5ff;
+    }
+
+    .route-section {
+      display: grid;
+      gap: 6px;
+      padding: 8px 12px 10px;
+    }
+
+    .promo-route-section {
+      position: relative;
+      margin: 0 10px 10px;
+      padding: 10px 12px;
+      overflow: hidden;
+      border: 1px solid rgba(203, 220, 239, 0.78);
+      border-radius: 16px;
+      background:
+        linear-gradient(135deg, rgba(240, 249, 255, 0.96), rgba(255, 247, 235, 0.74));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .promo-route-section::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(47,95,185,0.08), transparent 48%),
+        linear-gradient(300deg, rgba(255,151,64,0.11), transparent 44%);
+      pointer-events: none;
+    }
+
+    .promo-route-section::after {
+      content: "官方特惠";
+      position: absolute;
+      right: 12px;
+      top: 6px;
+      color: rgba(47, 95, 185, 0.08);
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .promo-route-section > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .route-search-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .route-chips {
+      min-width: 0;
+      flex: 1 1 0;
+      flex-wrap: wrap;
+      overflow: visible;
+    }
+
+    .route-search-button {
+      flex: 0 0 auto;
+      min-width: 92px;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 18px;
+      color: #fff;
+      background: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 16px rgba(47, 95, 185, 0.2);
+    }
+
+    .family-trip-search {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: 10px;
+    }
+
+    .family-trip-search.action-only {
+      grid-template-columns: 1fr;
+      justify-items: end;
+    }
+
+    .family-trip-copy {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+
+    .family-trip-copy small {
+      color: #1f365e;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .family-trip-copy strong {
+      min-width: 0;
+      color: #1f365e;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .family-deal-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+      gap: 6px;
+      align-items: stretch;
+    }
+
+    .family-deal-card {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 7px;
+      min-width: 0;
+      min-height: 48px;
+      padding: 8px 9px;
+      border: 0;
+      border-radius: 12px;
+      color: #202a35;
+      background: #f5faf9;
+      text-align: left;
+    }
+
+    .family-deal-card strong {
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .family-deal-card .deal-meta {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .family-deal-card small {
+      overflow: hidden;
+      color: #9aa3ad;
+      font-size: 10.5px;
+      font-weight: 800;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .family-deal-card em {
+      color: #f04a24;
+      font-size: 15px;
+      font-style: normal;
+      font-weight: 900;
+      line-height: 1;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    .family-deal-row > .route-search-button {
+      align-self: center;
+      justify-self: end;
+      min-width: 92px;
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 18px;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+
+    .dim-note {
+      display: flex;
+      gap: 8px;
+      margin-top: 9px;
+      color: #7b879d;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .dim-note b {
+      color: #47628f;
+    }
+
+    .airline-card {
+      margin: 0 16px 14px;
+      padding: 16px;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 8px 20px rgba(31, 67, 132, 0.06);
+    }
+
+    .airline-card .section-head {
+      margin-bottom: 12px;
+    }
+
+    .airline-promo {
+      position: relative;
+      min-height: 72px;
+      margin-bottom: 16px;
+      padding: 14px 120px 14px 14px;
+      overflow: hidden;
+      border-radius: 14px;
+      color: #0e5c74;
+      background:
+        radial-gradient(circle at 86% 18%, rgba(255,255,255,0.9), transparent 34px),
+        linear-gradient(105deg, #c7fff3 0%, #4ecdf0 58%, #69b9ff 100%);
+    }
+
+    .airline-promo strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #d72828;
+      font-size: 18px;
+      line-height: 1.15;
+    }
+
+    .airline-promo span {
+      display: inline-flex;
+      padding: 4px 9px;
+      border-radius: 12px;
+      color: #0e7b55;
+      background: rgba(255,255,255,0.74);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .airline-promo::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      top: 20px;
+      width: 88px;
+      height: 28px;
+      border-radius: 60% 60% 40% 40%;
+      background: rgba(255,255,255,0.92);
+      transform: rotate(-8deg);
+      box-shadow:
+        -26px 10px 0 -10px rgba(255,255,255,0.86),
+        28px 8px 0 -12px rgba(255,255,255,0.78);
+    }
+
+    .airline-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px 10px;
+      text-align: center;
+    }
+
+    .airline-item {
+      display: grid;
+      justify-items: center;
+      gap: 7px;
+      color: #30405f;
+      font-size: 12px;
+    }
+
+    .airline-logo {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 21px;
+      color: #fff;
+      background: #d95555;
+      font-weight: 800;
+      box-shadow: 0 6px 12px rgba(38, 61, 109, 0.12);
+    }
+
+    .airline-logo.blue {
+      background: #3b6fbd;
+    }
+
+    .airline-logo.teal {
+      background: #4fa5a5;
+    }
+
+    .airline-logo.gold {
+      background: #d3a735;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 14;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: 78px;
+      padding: 8px 18px 12px;
+      border-top: 1px solid rgba(210, 220, 234, 0.9);
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(18px);
+    }
+
+    .bottom-nav button {
+      display: grid;
+      justify-items: center;
+      align-content: center;
+      gap: 5px;
+      color: #394a68;
+      font-size: 11px;
+    }
+
+    .bottom-nav button.active i {
+      color: #2f5fb9;
+      background: #eaf2ff;
+    }
+
+    .phone.more-open .bottom-nav [data-more-toggle] {
+      color: #2f5fb9;
+    }
+
+    .phone.more-open .bottom-nav [data-more-toggle] i {
+      color: #2f5fb9;
+      background: #eaf2ff;
+    }
+
+    .bottom-nav .tool-icon {
+      width: 26px;
+      height: 26px;
+      transform: scale(0.86);
+    }
+
+    .more-services {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 78px;
+      z-index: 13;
+      display: none;
+      padding: 14px 18px 18px;
+      border-top: 1px solid #e4ebf5;
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 -14px 28px rgba(29, 52, 92, 0.12);
+    }
+
+    .phone.more-open .more-services {
+      display: block;
+    }
+
+    .more-services-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      color: #1d3155;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .more-services-head button {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      color: #8a97ad;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .more-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px 18px;
+    }
+
+    .more-grid button {
+      display: grid;
+      justify-items: center;
+      gap: 7px;
+      color: #2f3e59;
+      font-size: 11px;
+    }
+
+    .more-grid .tool-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+    }
+
+    .service-icon {
+      position: relative;
+      display: block;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      color: #2f5fb9;
+      background: #edf4ff;
+    }
+
+    .service-icon::before,
+    .service-icon::after {
+      content: "";
+      position: absolute;
+      box-sizing: border-box;
+      border-color: currentColor;
+    }
+
+    .service-icon.card {
+      color: #ff7f32;
+      background: #fff5eb;
+    }
+
+    .service-icon.card::before {
+      left: 9px;
+      top: 11px;
+      width: 16px;
+      height: 12px;
+      border: 2px solid currentColor;
+      border-radius: 3px;
+    }
+
+    .service-icon.card::after {
+      left: 11px;
+      top: 15px;
+      width: 12px;
+      border-top: 2px solid currentColor;
+    }
+
+    .service-icon.shield {
+      color: #2f5fb9;
+      background: #eef4ff;
+    }
+
+    .service-icon.shield::before {
+      left: 10px;
+      top: 7px;
+      width: 14px;
+      height: 17px;
+      border: 2px solid currentColor;
+      border-radius: 8px 8px 10px 10px;
+    }
+
+    .service-icon.shield::after {
+      left: 15px;
+      top: 12px;
+      width: 6px;
+      height: 4px;
+      border-left: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+    }
+
+    .service-icon.wifi {
+      color: #459981;
+      background: #edf8f4;
+    }
+
+    .service-icon.wifi::before {
+      left: 9px;
+      top: 10px;
+      width: 16px;
+      height: 11px;
+      border-top: 2px solid currentColor;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .service-icon.wifi::after {
+      left: 14px;
+      top: 16px;
+      width: 6px;
+      height: 6px;
+      border-top: 2px solid currentColor;
+      border-radius: 8px 8px 0 0;
+      box-shadow: 2px 5px 0 -1px currentColor;
+    }
+
+    .service-icon.bell {
+      color: #f3445a;
+      background: #fff0f2;
+    }
+
+    .service-icon.bell::before {
+      left: 10px;
+      top: 8px;
+      width: 14px;
+      height: 15px;
+      border: 2px solid currentColor;
+      border-radius: 9px 9px 5px 5px;
+      border-bottom-width: 1px;
+    }
+
+    .service-icon.bell::after {
+      left: 14px;
+      top: 24px;
+      width: 6px;
+      border-top: 2px solid currentColor;
+      border-radius: 2px;
+    }
+
+    .sheet-mask {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      align-items: flex-end;
+      background: rgba(22, 35, 60, 0.34);
+    }
+
+    .sheet-mask.open {
+      display: flex;
+    }
+
+    .sheet {
+      width: 100%;
+      max-height: 76%;
+      overflow-y: auto;
+      padding: 10px 18px 18px;
+      border-radius: 26px 26px 0 0;
+      background: #fff;
+      box-shadow: 0 -20px 45px rgba(30, 54, 98, 0.22);
+    }
+
+    .sheet-handle {
+      width: 44px;
+      height: 5px;
+      margin: 0 auto 14px;
+      border-radius: 3px;
+      background: #d8e1ef;
+    }
+
+    .sheet-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .sheet-title h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .close {
+      padding: 8px 12px;
+      border-radius: 16px;
+      background: #f1f5fb;
+      color: #506078;
+      font-weight: 700;
+    }
+
+    .icon-close {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      color: #69778e;
+      background: #f4f6fa;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .profile-sheet {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 82%;
+      max-height: 88%;
+      padding: 0;
+      overflow: hidden;
+      background: #f7f9fd;
+    }
+
+    .profile-sheet .sheet-handle {
+      flex: 0 0 auto;
+      margin: 10px auto 8px;
+    }
+
+    .profile-sheet-head {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px 10px;
+      border-bottom: 1px solid #e5edf7;
+      background: #fff;
+    }
+
+    .profile-sheet-head h3 {
+      margin: 0;
+      color: #172d52;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .profile-sheet-head p {
+      margin: 3px 0 0;
+      color: #73829b;
+      font-size: 11px;
+      line-height: 1.3;
+    }
+
+    .profile-sheet-body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 12px 14px 82px;
+    }
+
+    .sheet-mask.page-panel {
+      z-index: 24;
+      align-items: stretch;
+      background: #f7f9fd;
+    }
+
+    .sheet-mask.page-panel.open {
+      display: block;
+    }
+
+    .sheet-mask[data-passenger-picker-sheet] {
+      z-index: 30;
+    }
+
+    .sheet-mask.page-panel .profile-sheet {
+      width: 100%;
+      height: 100%;
+      max-height: none;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .sheet-mask.page-panel .profile-sheet .sheet-handle {
+      display: none;
+    }
+
+    .sheet-mask.page-panel .profile-sheet-head {
+      min-height: 64px;
+      justify-content: flex-start;
+      padding: 12px 14px 10px;
+    }
+
+    .sheet-mask.page-panel .profile-sheet-head > div {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .sheet-mask.page-panel .back-close {
+      order: -1;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 17px;
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    .profile-panel {
+      margin-bottom: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 6px 16px rgba(35, 67, 117, 0.05);
+    }
+
+    .profile-panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .panel-head-inline {
+      align-items: center;
+    }
+
+    .panel-inline-note {
+      margin: 0 0 0 auto;
+      color: #73829b;
+      font-size: 10px;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .profile-panel h4 {
+      margin: 0;
+      color: #1c345a;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .profile-panel-head p,
+    .panel-note {
+      margin: 3px 0 0;
+      color: #73829b;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .setting-list,
+    .data-stack,
+    .companion-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .data-stack.compact-docs {
+      gap: 0;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #f7faff;
+    }
+
+    .data-stack.compact-docs .data-card,
+    .data-stack.compact-docs .setting-row {
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .data-stack.compact-docs .data-card + .data-card,
+    .data-stack.compact-docs .setting-row {
+      border-top: 1px solid #e7eef7;
+    }
+
+    .data-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 6px 12px;
+      min-height: 76px;
+      padding: 12px 14px;
+      border: 0;
+      border-radius: 14px;
+      background: #f7faff;
+    }
+
+    .compact-docs .data-card {
+      min-height: 64px;
+      padding: 10px 12px;
+    }
+
+    .compact-docs .voucher-row {
+      min-height: 64px;
+      padding: 10px 12px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+    }
+
+    .compact-docs .voucher-row .setting-main {
+      min-width: 0;
+    }
+
+    .compact-docs .voucher-row .toggle-switch {
+      margin-right: 0;
+    }
+
+    .data-title {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      color: #1f365e;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .invoice-type {
+      display: inline-flex;
+      align-items: center;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 9px;
+      color: #1c7c43;
+      background: #e8f8ee;
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .data-lines {
+      display: grid;
+      gap: 3px;
+      grid-column: 1;
+      color: #687994;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .data-card > .mini-link {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      align-self: center;
+      white-space: nowrap;
+    }
+
+    .family-todo-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: -2px 0 8px;
+      color: #73829b;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .family-todo-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .family-todo-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 5px 10px;
+      align-items: center;
+      min-height: 54px;
+      padding: 9px 11px;
+      border: 1px solid #dbe7f5;
+      border-radius: 12px;
+      background: #f8fbff;
+      text-align: left;
+    }
+
+    .family-todo-row.warning {
+      border-color: #f0c886;
+      background: #fffaf1;
+    }
+
+    .family-todo-row.neutral {
+      border-color: #d8e1ec;
+      background: #f7faff;
+    }
+
+    .family-todo-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .family-todo-title strong {
+      overflow: hidden;
+      color: #1f365e;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .family-todo-desc {
+      grid-column: 1 / -1;
+      color: #6e7e97;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .family-todo-action {
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .family-doc-primary {
+      width: 100%;
+      height: 34px;
+      margin-top: 9px;
+      border-radius: 17px;
+      color: #fff;
+      background: var(--blue);
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(47, 95, 185, 0.16);
+    }
+
+    .family-birth-input {
+      width: 100%;
+      min-width: 0;
+      height: 28px;
+      padding: 0 8px;
+      border: 1px solid #c7d9ef;
+      border-radius: 9px;
+      color: #20375e;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .family-ticket-result {
+      display: grid;
+      gap: 4px;
+      margin: 8px 0 10px;
+      padding: 9px 10px;
+      border: 1px solid #d7e4f4;
+      border-radius: 12px;
+      background: #f7fbff;
+      color: #20375e;
+    }
+
+    .family-ticket-result.warning {
+      border-color: #f0c886;
+      background: #fffaf1;
+    }
+
+    .family-ticket-result strong {
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .family-ticket-result span {
+      color: #72839c;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .passenger-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .passenger-tile {
+      min-height: 28px;
+      padding: 4px 8px;
+      border: 1px solid #bfd9c4;
+      border-radius: 5px;
+      color: #253e68;
+      background: #fff;
+      text-align: center;
+    }
+
+    .passenger-tile strong {
+      display: block;
+      overflow: hidden;
+      color: #244577;
+      font-size: 11px;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .passenger-tile small {
+      display: block;
+      margin-top: 2px;
+      color: #6f7f98;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .passenger-tile.warning {
+      border-color: #f0c886;
+      color: #9a641b;
+      background: #fffaf1;
+    }
+
+    .passenger-tile.warning strong {
+      color: #8a5c1b;
+    }
+
+    .passenger-tile.selected {
+      border-color: #64c878;
+      color: #16843d;
+      background: #f4fff6;
+      box-shadow: none;
+    }
+
+    .passenger-tile.add {
+      border-color: #64c878;
+      color: #16843d;
+      background: #f4fff6;
+    }
+
+    .passenger-tile.selected strong,
+    .passenger-tile.add strong {
+      color: #16843d;
+    }
+
+    .companion-details {
+      display: grid;
+      gap: 7px;
+    }
+
+    .companion-detail {
+      display: none;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid #dbe7f6;
+      border-radius: 13px;
+      background: #fbfdff;
+    }
+
+    .companion-detail.show {
+      display: grid;
+    }
+
+    .detail-main strong {
+      display: block;
+      margin-bottom: 3px;
+      color: #1f365e;
+      font-size: 12px;
+    }
+
+    .detail-main span {
+      color: #74839a;
+      font-size: 10px;
+      line-height: 1.35;
+    }
+
+    .setting-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 0;
+      border-top: 1px solid #edf2f8;
+    }
+
+    .setting-row:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .setting-main strong {
+      display: block;
+      margin-bottom: 3px;
+      color: #20375e;
+      font-size: 13px;
+    }
+
+    .setting-main span {
+      display: block;
+      color: #75839b;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .setting-actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-tag {
+      padding: 3px 7px;
+      border-radius: 10px;
+      color: #1b8b5c;
+      background: #eaf8f1;
+      font-size: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-tag.warn,
+    .status-tag.warning {
+      color: #a46418;
+      background: #fff6e8;
+    }
+
+    .status-tag.neutral {
+      color: #4f6580;
+      background: #edf3fa;
+    }
+
+    .mini-link {
+      color: var(--blue);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 44px;
+      height: 26px;
+      border-radius: 13px;
+      background: #ccd8e8;
+      transition: background 0.2s ease;
+    }
+
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(23, 45, 82, 0.18);
+      transition: transform 0.2s ease;
+    }
+
+    .toggle-switch[aria-pressed="true"] {
+      background: var(--green);
+    }
+
+    .toggle-switch[aria-pressed="true"]::after {
+      transform: translateX(18px);
+    }
+
+    .preference-block {
+      display: grid;
+      gap: 8px;
+    }
+
+    .flight-pref-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .flight-pref-card {
+      position: relative;
+      min-height: 54px;
+      padding: 9px 5px 7px;
+      border: 1px solid #d7e4f4;
+      border-radius: 8px;
+      color: #264976;
+      background: #f8fbff;
+      text-align: left;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+    }
+
+    .flight-pref-card strong {
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.15;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .flight-pref-card span {
+      color: #72839c;
+      font-size: 7.5px;
+      font-weight: 700;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .flight-pref-check {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--green);
+      display: none;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1;
+      box-shadow: 0 2px 5px rgba(29, 166, 100, 0.22);
+    }
+
+    .flight-pref-card.selected {
+      border-color: var(--blue);
+      color: #1f365e;
+      background: #f7fbff;
+      box-shadow: inset 0 0 0 1px var(--blue);
+    }
+
+    .flight-pref-card.selected span {
+      color: #72839c;
+    }
+
+    .flight-pref-card.selected .flight-pref-check {
+      display: grid;
+    }
+
+    .profile-panel[data-family-section="elderly-services"] .flight-pref-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-panel[data-family-section="elderly-services"] .flight-pref-card {
+      min-height: 68px;
+      padding: 10px 9px;
+    }
+
+    .elderly-mode-choice {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .elderly-mode-choice button {
+      min-height: 46px;
+      padding: 8px 10px;
+      border: 1px solid #d7e4f4;
+      border-radius: 12px;
+      color: #244a78;
+      background: #f8fbff;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .elderly-mode-choice button.active {
+      border-color: var(--blue);
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 8px 16px rgba(47, 98, 190, 0.18);
+    }
+
+    .guide-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .guide-card {
+      display: grid;
+      gap: 3px;
+      padding: 8px 10px;
+      border-radius: 11px;
+      background: #f6f9fd;
+      border: 1px solid #e0e9f5;
+    }
+
+    .guide-card strong {
+      color: #213b64;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .guide-card span {
+      color: #6c7d96;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .senior-mode .city-card strong,
+    .senior-mode .date-main strong {
+      font-size: 26px;
+    }
+
+    .senior-mode .confirm-search {
+      min-height: 56px;
+      font-size: 16px;
+    }
+
+    .family-capacity-note {
+      margin: 8px 0 0;
+      padding: 7px 9px;
+      border-radius: 10px;
+      color: #7d5a1d;
+      background: #fff7e8;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .family-trip-context {
+      margin: 7px 0 8px;
+      padding: 7px 9px;
+      border-radius: 10px;
+      color: #58708f;
+      background: #f4f8fd;
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .family-trip-context strong {
+      color: #1f365e;
+      font-weight: 900;
+    }
+
+    .family-member-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .family-member-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px 8px;
+      align-items: center;
+      padding: 9px 10px;
+      border: 1px solid #d7e4f4;
+      border-radius: 12px;
+      color: #1f365e;
+      background: #f8fbff;
+      text-align: left;
+    }
+
+    .family-member-row.selected {
+      border-color: var(--blue);
+      background: #f4f9ff;
+      box-shadow: inset 0 0 0 1px var(--blue);
+    }
+
+    .family-member-main {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .family-member-main strong {
+      overflow: hidden;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.2;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .family-member-main span {
+      overflow: hidden;
+      color: #6f7f98;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .family-member-risk {
+      grid-column: 1 / -1;
+      color: #5f718a;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .family-member-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .family-member-delete {
+      width: 26px;
+      height: 26px;
+      border-radius: 13px;
+      color: #8c5b4d;
+      background: #fff1ed;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .family-add-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    .family-add-row button {
+      min-height: 30px;
+      border: 1px dashed #8ccf9b;
+      border-radius: 9px;
+      color: #16843d;
+      background: #f7fff8;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .family-add-row button.primary {
+      border-style: solid;
+      border-color: var(--blue);
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 8px 16px rgba(47, 95, 185, 0.16);
+    }
+
+    .family-add-row button.secondary {
+      border-color: #d8e5f4;
+      color: #6a7f9c;
+      background: #fbfdff;
+    }
+
+    .family-tip-confirm {
+      width: 100%;
+      min-height: 32px;
+      margin-top: 9px;
+      border: 1px solid #c9d8ee;
+      border-radius: 16px;
+      color: var(--blue);
+      background: #f8fbff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .family-tip-confirm.done {
+      border-color: #ccebd8;
+      color: #14935b;
+      background: #f3fff8;
+    }
+
+    .family-tip-list {
+      display: grid;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .family-tip-list span {
+      padding: 6px 8px;
+      border-radius: 9px;
+      color: #556984;
+      background: #f4f7fb;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .family-tips-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .family-tip-row {
+      display: grid;
+      grid-template-columns: 24px 1fr;
+      gap: 8px;
+      align-items: start;
+      padding: 8px 9px;
+      border-radius: 11px;
+      background: #f6f9fd;
+      color: #264976;
+    }
+
+    .family-tip-icon {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border-radius: 12px;
+      color: #2d60b9;
+      background: #e9f1ff;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .family-tip-copy {
+      display: grid;
+      gap: 2px;
+    }
+
+    .family-tip-copy strong {
+      color: #1f365e;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .family-tip-copy span {
+      color: #6f7f98;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .passenger-picker-sheet {
+      max-height: 58vh;
+    }
+
+    .passenger-picker-copy {
+      margin: 0 18px 10px;
+      color: #667891;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .passenger-picker-list {
+      display: grid;
+      gap: 8px;
+      padding: 0 18px 14px;
+    }
+
+    .passenger-choice {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3px 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 1px solid #d7e4f4;
+      border-radius: 12px;
+      color: #20375e;
+      background: #f8fbff;
+      text-align: left;
+    }
+
+    .passenger-choice.recommended {
+      border-color: var(--blue);
+      background: #f1f7ff;
+      box-shadow: inset 0 0 0 1px rgba(47, 95, 185, 0.22);
+    }
+
+    .passenger-choice strong {
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .passenger-choice span {
+      color: #6f7f98;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .passenger-choice em {
+      grid-row: 1 / 3;
+      grid-column: 2;
+      color: var(--blue);
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 900;
+    }
+
+    .passenger-new-link {
+      margin: 0 18px 18px;
+      min-height: 34px;
+      border: 1px dashed #8ccf9b;
+      border-radius: 12px;
+      color: #16843d;
+      background: #f7fff8;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .search-passenger-sheet {
+      max-height: 78vh;
+      padding-bottom: 0;
+      background: #eef3fa;
+    }
+
+    .search-passenger-sheet .sheet-title {
+      margin: 0 0 4px;
+      padding: 0 2px;
+    }
+
+    .search-passenger-sheet .sheet-title h3 {
+      flex: 1;
+      text-align: center;
+    }
+
+    .search-passenger-subtitle {
+      margin: 0 0 14px;
+      color: #273a5d;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .search-passenger-subtitle em {
+      color: #14a566;
+      font-style: normal;
+    }
+
+    .search-passenger-card {
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 8px 16px rgba(30, 54, 98, 0.08);
+    }
+
+    .search-passenger-card {
+      padding: 12px 12px 10px;
+    }
+
+    .search-passenger-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .search-passenger-option {
+      display: grid;
+      grid-template-columns: 28px 1fr 28px;
+      gap: 10px;
+      align-items: center;
+      min-height: 58px;
+      padding: 6px 0;
+      color: #1e2f4f;
+      text-align: left;
+      background: transparent;
+    }
+
+    .select-ring {
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border: 2px solid #2d7df0;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .search-passenger-option.selected .select-ring {
+      background: #1677ff;
+    }
+
+    .search-passenger-info {
+      display: grid;
+      gap: 3px;
+      min-width: 0;
+    }
+
+    .search-passenger-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .search-passenger-name strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .search-passenger-tag {
+      flex: 0 0 auto;
+      padding: 2px 5px;
+      border-radius: 5px;
+      color: #1677ff;
+      background: #eef5ff;
+      border: 1px solid #8fc0ff;
+      font-size: 10px;
+      line-height: 1.1;
+    }
+
+    .search-passenger-tag.child {
+      color: #ff8a00;
+      background: #fff5e8;
+      border-color: #ffd69b;
+    }
+
+    .search-passenger-id {
+      color: #8b96aa;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .passenger-edit-button {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      color: #1476ee;
+      font-size: 18px;
+      font-weight: 900;
+      background: transparent;
+    }
+
+    .search-passenger-more {
+      width: 100%;
+      min-height: 44px;
+      margin-top: 10px;
+      border-radius: 10px;
+      color: #1476ee;
+      background: #f3f7fd;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .search-passenger-footer {
+      position: sticky;
+      bottom: 0;
+      margin: 14px -18px 0;
+      padding: 12px 18px 16px;
+      background: #fff;
+      box-shadow: 0 -10px 20px rgba(30, 54, 98, 0.08);
+    }
+
+    .search-passenger-confirm {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 8px;
+      color: #fff;
+      background: #0a7cff;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .compact-routes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .compact-route {
+      min-height: 28px;
+      padding: 5px 9px;
+      border: 1px solid #d8e4f4;
+      border-radius: 14px;
+      color: #244577;
+      background: #fbfdff;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .compact-route.default {
+      color: #fff;
+      border-color: var(--blue);
+      background: var(--blue);
+    }
+
+    .profile-sheet-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 10px 14px 14px;
+      border-top: 1px solid #e5edf7;
+      background: linear-gradient(180deg, rgba(247,249,253,0.78), #fff 24%);
+    }
+
+    .sheet-primary {
+      height: 42px;
+      border-radius: 21px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .sheet-primary {
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 8px 16px rgba(47, 95, 185, 0.2);
+    }
+
+    .trip-switch {
+      display: flex;
+      width: 154px;
+      margin: 0 auto 12px;
+      padding: 4px;
+      border-radius: 18px;
+      background: #f0f3f8;
+      color: #8795aa;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .trip-switch button {
+      flex: 1;
+      padding: 6px 0;
+      border-radius: 15px;
+      font-weight: 700;
+    }
+
+    .trip-switch button.active {
+      color: #26385c;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(30, 50, 90, 0.08);
+    }
+
+    .od-selector {
+      display: grid;
+      grid-template-columns: 1fr 42px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .city-card {
+      min-width: 0;
+      padding: 12px 10px;
+      border-radius: 12px;
+      background: #f4f7fb;
+      text-align: left;
+    }
+
+    .city-card small {
+      display: block;
+      margin-bottom: 5px;
+      color: #8290a6;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .city-card strong {
+      display: block;
+      color: #162b51;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .sheet-swap {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 19px;
+      color: var(--green);
+      background: #eefaf4;
+      font-size: 17px;
+    }
+
+    .date-picker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      min-height: 54px;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: #1d3155;
+      background: #f4f7fb;
+      font-size: 12px;
+      font-weight: 800;
+      text-align: left;
+    }
+
+    .date-main {
+      display: grid;
+      gap: 4px;
+    }
+
+    .date-main small {
+      color: #8290a6;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .date-main strong {
+      color: #162b51;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .date-hint {
+      color: #7d8aa1;
+      font-size: 11px;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .carry-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 9px;
+    }
+
+    .carry-summary span {
+      padding: 4px 8px;
+      border-radius: 12px;
+      color: #2c4d85;
+      background: #f1f6ff;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .sheet-note {
+      margin: 0;
+      color: #7d8aa1;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .confirm-search {
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      width: 100%;
+      min-height: 50px;
+      margin-top: 12px;
+      border-radius: 25px;
+      color: #fff;
+      background: var(--blue);
+      font-weight: 800;
+    }
+
+    .confirm-search small {
+      color: rgba(255,255,255,0.78);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .family-action-sheet {
+      padding: 10px 18px 18px;
+    }
+
+    .family-action-copy {
+      margin: 0 0 14px;
+      color: #2d4264;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .family-action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .family-action-buttons button {
+      min-height: 40px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .family-action-secondary {
+      color: var(--blue);
+      border: 1px solid #cbdaf0;
+      background: #fff;
+    }
+
+    .family-action-primary {
+      color: #fff;
+      background: var(--blue);
+      box-shadow: 0 8px 16px rgba(47, 95, 185, 0.2);
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 92px;
+      z-index: 40;
+      transform: translateX(-50%) translateY(16px);
+      max-width: 310px;
+      padding: 10px 13px;
+      border-radius: 17px;
+      color: #fff;
+      background: rgba(18, 35, 68, 0.92);
+      font-size: 12px;
+      line-height: 1.45;
+      opacity: 0;
+      pointer-events: none;
+      transition: 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 920px) {
+      .page {
+        width: min(480px, 100vw);
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="phone-shell" aria-label="手机端 UE 原型">
+      <div class="phone">
+        <div class="phone-scroll">
+          <div class="status">
+            <span>9:41</span>
+            <span>●●● 5G ▰</span>
+          </div>
+
+          <section class="hero">
+            <h1>民航官方直销平台</h1>
+            <p>官方直连放心订 · AI按身份给建议</p>
+            <span class="direct-badge">40+航司官方直销</span>
+          </section>
+
+          <section class="search-card" aria-label="机票搜索区">
+            <div class="tabs"><b>国内机票</b><span>国际/港澳台</span><span>火车票</span><span>酒店/租车</span></div>
+            <div class="trip-type"><span class="active">单程</span><span>往返</span></div>
+            <div class="route-row"><span>北京</span><span class="swap">⇄</span><span style="text-align:right">上海</span></div>
+            <div class="date-row"><span>5月15日 <small>周五</small></span><span></span></div>
+            <button class="main-passenger-row" data-open-search-passengers>
+              <span class="main-passenger-copy">
+                <strong data-search-passenger-title>选择乘机人</strong>
+                <span data-search-passenger-subtitle>快速找到低价票</span>
+              </span>
+              <span class="main-passenger-chevron" aria-hidden="true">›</span>
+            </button>
+            <div class="search-options"><span>○ 仅看公务/头等舱</span><span>○ 带儿童/婴儿</span></div>
+            <div class="search-cta"><button class="primary" data-main-search>搜索预订</button><button class="ai-btn">AI<br>预订</button></div>
+          </section>
+
+          <nav class="quick-tools" aria-label="常用服务">
+            <button><i class="tool-icon ticket" aria-hidden="true"></i>机票订单</button>
+            <button><i class="tool-icon receipt" aria-hidden="true"></i>报销凭证</button>
+            <button><i class="tool-icon upgrade" aria-hidden="true"></i>升舱办理</button>
+            <button><i class="tool-icon seat" aria-hidden="true"></i>提前选座</button>
+            <button><i class="tool-icon luggage" aria-hidden="true"></i>行李急送</button>
+          </nav>
+
+          <section class="persona-module" aria-label="出行身份档案说明">
+            <div class="persona-section-head">
+              <h2>我的出行身份档案</h2>
+              <p>提前维护资料和偏好，下一次订票直接带入</p>
+            </div>
+
+            <nav class="persona-nav" aria-label="出行身份档案导航">
+              <button class="persona active" data-role-tab="business"><i>公</i><span><strong>商旅档案</strong><small>差旅少填</small></span></button>
+              <button class="persona" data-role-tab="parentChild"><i>亲</i><span><strong>亲子档案</strong><small>带娃检查</small></span></button>
+              <button class="persona" data-role-tab="elderly"><i>长</i><span><strong>长辈档案</strong><small>安心同步</small></span></button>
+              <button class="persona" data-role-tab="personal"><i>个</i><span><strong>个人档案</strong><small>自由低价</small></span></button>
+            </nav>
+          </section>
+
+          <section class="business-card" aria-label="我的商旅档案一级卡片" data-business-card>
+            <header>
+              <div class="business-top">
+              <div class="module-title">
+                <h2>我的商旅档案</h2>
+              </div>
+                <button class="link-btn" data-open-editor>编辑商旅档案</button>
+              </div>
+
+              <div class="profile-row">
+                <div class="avatar-slot" aria-label="商旅角色形象占位">
+                  <svg class="avatar-illustration" viewBox="0 0 96 116" aria-hidden="true">
+                    <rect x="14" y="80" width="68" height="30" rx="10" fill="#dce7f7"/>
+                    <path d="M24 72c5-14 17-22 25-22s20 8 25 22v36H24V72z" fill="#263f78"/>
+                    <path d="M45 66h8l5 42H40l5-42z" fill="#ffffff"/>
+                    <path d="M48 69l6 9-5 6-6-6 5-9z" fill="#1f376f"/>
+                    <path d="M35 42c0 16 8 26 18 26s18-10 18-26V30H35v12z" fill="#ffd5b3"/>
+                    <path d="M30 30c6-13 29-18 42-6v12H30v-6z" fill="#23345d"/>
+                    <path d="M34 34c10 0 23-3 34-9" stroke="#92a5c5" stroke-width="3" stroke-linecap="round"/>
+                    <path d="M28 72c-5 9-7 18-7 30v6h18V82c0-5-4-10-11-10z" fill="#2c4c91"/>
+                    <path d="M68 72c5 9 7 18 7 30v6H57V82c0-5 4-10 11-10z" fill="#2c4c91"/>
+                    <rect x="58" y="78" width="27" height="24" rx="6" fill="#d8e5f6" stroke="#223b73" stroke-width="3"/>
+                    <path d="M66 78v-6h11v6" fill="none" stroke="#223b73" stroke-width="3" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="summary-list">
+                  <div class="summary-line"><b>出行记录</b><span>近一年 6 次</span></div>
+                  <div class="summary-line"><b>常飞城市</b><span>上海 / 深圳 / 成都</span></div>
+                  <div class="summary-line"><b>常坐航司</b><span data-airline-summary>国航 / 东航</span></div>
+                </div>
+              </div>
+            </header>
+
+            <section class="ue-section compact-section">
+              <span class="compact-title">下次订票少填这些</span>
+              <div class="ready-grid" aria-label="下次订票少填信息">
+                <div class="ready-item">
+                  <div class="ready-main">
+                    <i class="ready-check" aria-hidden="true">✓</i>
+                    <strong>乘机人</strong>
+                    <span class="ready-badge">已就绪</span>
+                  </div>
+                </div>
+                <div class="ready-item">
+                  <div class="ready-main">
+                    <i class="ready-check" aria-hidden="true">✓</i>
+                    <strong>报销资料</strong>
+                    <span class="ready-badge">已就绪</span>
+                  </div>
+                </div>
+                <div class="ready-item">
+                  <div class="ready-main">
+                    <i class="ready-check" aria-hidden="true">✓</i>
+                    <strong>常同行</strong>
+                    <span class="ready-badge" data-companion-summary>2位</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="ue-section compact-section">
+              <div class="business-top">
+                <span class="compact-title">优先看这些航班</span>
+                <span class="pref-note">只排序，不隐藏航班</span>
+              </div>
+              <div class="pref-row selectable" data-pref-summary></div>
+            </section>
+
+            <section class="ue-section route-section promo-route-section">
+              <span class="compact-title">常飞航线</span>
+              <div class="route-search-row">
+                <div class="route-chips" data-route-chips>
+                  <button class="chip route-chip active" data-route="北京 → 上海">北京 → 上海</button>
+                  <button class="chip route-chip" data-route="北京 → 深圳">北京 → 深圳</button>
+                  <button class="chip route-chip" data-route="北京 → 成都">北京 → 成都</button>
+                </div>
+                <button class="route-search-button" data-open-search>搜索航班</button>
+              </div>
+            </section>
+          </section>
+
+          <section class="airline-card" aria-label="航空公司专区">
+            <div class="section-head"><span style="font-size:18px">航空公司专区</span><small>更多航空公司 ›</small></div>
+            <div class="airline-promo" aria-label="航司活动专区">
+              <strong>南航品牌馆</strong>
+              <span>总有你要的特价机票</span>
+            </div>
+            <div class="airline-grid">
+              <button class="airline-item"><span class="airline-logo">国</span><span>中国国航</span></button>
+              <button class="airline-item"><span class="airline-logo blue">东</span><span>东方航空</span></button>
+              <button class="airline-item"><span class="airline-logo blue">南</span><span>南方航空</span></button>
+              <button class="airline-item"><span class="airline-logo gold">海</span><span>海南航空</span></button>
+              <button class="airline-item"><span class="airline-logo">川</span><span>四川航空</span></button>
+              <button class="airline-item"><span class="airline-logo">深</span><span>深圳航空</span></button>
+              <button class="airline-item"><span class="airline-logo teal">厦</span><span>厦门航空</span></button>
+              <button class="airline-item"><span class="airline-logo blue">鲁</span><span>山东航空</span></button>
+            </div>
+          </section>
+        </div>
+
+        <section class="more-services" aria-label="更多服务" data-more-services>
+          <div class="more-services-head">
+            <span>更多服务</span>
+            <button data-more-toggle>收起⌄</button>
+          </div>
+          <div class="more-grid">
+            <button><i class="service-icon card" aria-hidden="true"></i>卡权益</button>
+            <button><i class="tool-icon upgrade" aria-hidden="true"></i>升舱</button>
+            <button><i class="tool-icon seat" aria-hidden="true"></i>选座</button>
+            <button><i class="service-icon shield" aria-hidden="true"></i>客票验证</button>
+            <button><i class="tool-icon luggage" aria-hidden="true"></i>行李</button>
+            <button><i class="service-icon wifi" aria-hidden="true"></i>WIFI</button>
+            <button><i class="service-icon bell" aria-hidden="true"></i>余票监控</button>
+          </div>
+        </section>
+
+        <nav class="bottom-nav" aria-label="底部导航">
+          <button class="active"><i class="tool-icon ticket" aria-hidden="true"></i>机票订单</button>
+          <button><i class="tool-icon receipt" aria-hidden="true"></i>报销凭证</button>
+          <button><i class="tool-icon group" aria-hidden="true"></i>团体机票</button>
+          <button data-more-toggle aria-expanded="false"><i class="tool-icon more" aria-hidden="true"></i><span data-more-label>更多</span></button>
+        </nav>
+
+        <div class="sheet-mask page-panel" data-editor-sheet>
+          <div class="sheet profile-sheet">
+            <div class="sheet-handle"></div>
+            <div class="profile-sheet-head">
+              <div>
+                <h3>编辑商旅档案</h3>
+                <p>一次维护，后续差旅订票自动带入</p>
+              </div>
+              <button class="icon-close back-close" data-close-sheet aria-label="返回">‹</button>
+            </div>
+
+            <div class="profile-sheet-body">
+              <section class="profile-panel" aria-label="常用订票资料">
+                <div class="profile-panel-head panel-head-inline">
+                  <h4>常用订票资料</h4>
+                  <p class="panel-inline-note">下次确认订单时自动使用</p>
+                </div>
+                <div class="data-stack compact-docs">
+                  <div class="data-card">
+                    <div class="data-title">
+                      <span>本人资料</span>
+                      <span class="status-tag">已完善</span>
+                    </div>
+                    <div class="data-lines">
+                      <span>王可乐 · 身份证 1398**********06X</span>
+                    </div>
+                    <button class="mini-link" data-edit-passenger>编辑</button>
+                  </div>
+                  <div class="data-card">
+                    <div class="data-title">
+                      <span>报销资料</span>
+                      <span class="invoice-type">企业</span>
+                      <span class="status-tag">已保存</span>
+                    </div>
+                    <div class="data-lines">
+                      <span>抬头名称 北京某某科技有限公司</span>
+                      <span>公司税号 9111**********8X</span>
+                    </div>
+                    <button class="mini-link" data-edit-invoice>编辑</button>
+                  </div>
+                  <div class="setting-row voucher-row">
+                    <div class="setting-main">
+                      <strong>机票电子行程单自动发送</strong>
+                      <span data-voucher-status>行程结束后 7 个工作日内自动发送至 gaop****@xxx.com</span>
+                    </div>
+                    <button class="toggle-switch" data-voucher-toggle aria-label="出票后发送凭证" aria-pressed="true"></button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="profile-panel" aria-label="常同行">
+                <div class="profile-panel-head">
+                  <div>
+                    <h4>常用同行</h4>
+                  </div>
+                </div>
+                <div class="companion-list">
+                  <div class="passenger-grid">
+                    <button class="passenger-tile selected" data-companion-a>
+                      <strong>同事A</strong>
+                    </button>
+                    <button class="passenger-tile" data-companion-b>
+                      <strong>同事B</strong>
+                    </button>
+                    <button class="passenger-tile add" data-add-companion>
+                      <strong>+乘机人</strong>
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <section class="profile-panel" aria-label="航班偏好" data-editor-section="prefs">
+                <div class="profile-panel-head">
+                  <div>
+                    <h4>航班偏好</h4>
+                    <p>搜索时优先考虑这些，不隐藏其他航班</p>
+                  </div>
+                </div>
+                <div class="preference-block" data-pref-block>
+                  <div class="flight-pref-grid" data-flight-pref-grid></div>
+                </div>
+              </section>
+
+              <section class="profile-panel" aria-label="常飞航线">
+                <div class="profile-panel-head">
+                  <div>
+                    <h4>常飞航线</h4>
+                    <p>首页搜索航班默认使用这条路线</p>
+                  </div>
+                </div>
+                <div class="compact-routes" data-editor-routes>
+                  <button class="compact-route default" data-editor-route="北京 → 上海">北京 → 上海</button>
+                  <button class="compact-route" data-editor-route="北京 → 深圳">北京 → 深圳</button>
+                  <button class="compact-route" data-editor-route="北京 → 成都">北京 → 成都</button>
+                  <button class="compact-route" data-add-route>添加航线</button>
+                </div>
+              </section>
+            </div>
+
+            <div class="profile-sheet-footer">
+              <button class="sheet-primary" data-editor-save>保存</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-mask" data-search-sheet>
+          <div class="sheet">
+            <div class="sheet-handle"></div>
+            <div class="trip-switch" aria-label="行程类型">
+              <button class="active" data-trip-type="single">单程</button>
+              <button data-trip-type="round">往返</button>
+            </div>
+            <div class="od-selector" aria-label="出发到达选择">
+              <button class="city-card" data-city-field="from">
+                <small>出发地</small>
+                <strong data-origin-city>北京</strong>
+              </button>
+              <button class="sheet-swap" data-swap-route aria-label="交换出发到达">⇄</button>
+              <button class="city-card" data-city-field="to">
+                <small>到达地</small>
+                <strong data-destination-city>上海</strong>
+              </button>
+            </div>
+            <button class="date-picker" data-date-picker>
+              <span class="date-main">
+                <small>出行日期</small>
+                <strong data-travel-date>5月15日 周五</strong>
+              </span>
+              <em class="date-hint">可修改</em>
+            </button>
+            <div class="carry-summary">
+              <span>乘机人已填</span>
+              <span>报销已填</span>
+              <span>偏好已选</span>
+            </div>
+            <p class="sheet-note">只调整排序，不隐藏其他航班</p>
+            <button class="confirm-search" data-confirm-search>
+              <span>搜索航班</span>
+              <small>已按商旅偏好排序</small>
+            </button>
+          </div>
+        </div>
+
+        <div class="sheet-mask" data-search-passenger-sheet>
+          <div class="sheet search-passenger-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">
+              <button class="icon-close" data-search-passenger-close aria-label="关闭">×</button>
+              <h3>选择乘机人</h3>
+              <span style="width:32px" aria-hidden="true"></span>
+            </div>
+            <p class="search-passenger-subtitle">乘机人信息越完善，越能<em>精准找到低价票</em></p>
+            <div class="search-passenger-card">
+              <div class="search-passenger-list" data-search-passenger-list></div>
+              <button class="search-passenger-more" data-search-passenger-more>＋ 更多乘机人</button>
+            </div>
+            <div class="search-passenger-footer">
+              <button class="search-passenger-confirm" data-search-passenger-confirm>确定</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-mask page-panel" data-role-manager-sheet>
+          <div class="sheet profile-sheet">
+            <div class="sheet-handle"></div>
+            <div class="profile-sheet-head">
+              <div>
+                <h3 data-role-sheet-title>管理资料</h3>
+                <p data-role-sheet-subtitle>提前设置，订票更省心</p>
+              </div>
+              <button class="icon-close back-close" data-close-sheet aria-label="返回">‹</button>
+            </div>
+            <div class="profile-sheet-body" data-role-sheet-body></div>
+            <div class="profile-sheet-footer">
+              <button class="sheet-primary" data-role-save>保存</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-mask" data-family-action-sheet>
+          <div class="sheet family-action-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">
+              <h3>带娃订票提醒</h3>
+              <button class="icon-close" data-family-action-close aria-label="关闭">×</button>
+            </div>
+            <p class="family-action-copy" data-family-action-copy></p>
+            <div class="family-action-buttons">
+              <button class="family-action-secondary" data-family-action-secondary>继续搜索</button>
+              <button class="family-action-primary" data-family-action-primary>去完善</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-mask" data-passenger-picker-sheet>
+          <div class="sheet passenger-picker-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">
+              <h3>选择常用乘机人</h3>
+              <button class="icon-close" data-passenger-picker-close aria-label="关闭">×</button>
+            </div>
+            <p class="passenger-picker-copy" data-passenger-picker-copy>从现有乘机人里选择，资料返回后按当前场景更新档案状态。</p>
+            <div class="passenger-picker-list">
+              <button class="passenger-choice" data-passenger-choice="elderly" data-picker-role="elderly"><strong>李桂英</strong><span>长辈，证件资料已保存</span><em>›</em></button>
+              <button class="passenger-choice" data-passenger-choice="adult" data-picker-role="parentChild"><strong>张伟</strong><span>成人，证件资料已保存</span><em>›</em></button>
+              <button class="passenger-choice" data-passenger-choice="child" data-picker-role="parentChild"><strong>张小宝</strong><span>儿童票年龄，证件资料已保存</span><em>›</em></button>
+              <button class="passenger-choice" data-passenger-choice="infant" data-picker-role="parentChild"><strong>张小萌</strong><span>婴儿票年龄，需成人同订</span><em>›</em></button>
+            </div>
+            <button class="passenger-new-link" data-passenger-new>+ 新增乘机人</button>
+          </div>
+        </div>
+
+        <div class="toast" data-toast></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const phone = document.querySelector(".phone");
+    const phoneScroll = document.querySelector(".phone-scroll");
+    const toast = document.querySelector("[data-toast]");
+    const editorSheet = document.querySelector("[data-editor-sheet]");
+    const searchSheet = document.querySelector("[data-search-sheet]");
+    const roleManagerSheet = document.querySelector("[data-role-manager-sheet]");
+    const familyActionSheet = document.querySelector("[data-family-action-sheet]");
+    const passengerPickerSheet = document.querySelector("[data-passenger-picker-sheet]");
+    const searchPassengerSheet = document.querySelector("[data-search-passenger-sheet]");
+    const searchPassengerRow = document.querySelector("[data-open-search-passengers]");
+    const searchPassengerTitle = document.querySelector("[data-search-passenger-title]");
+    const searchPassengerSubtitle = document.querySelector("[data-search-passenger-subtitle]");
+    const searchPassengerList = document.querySelector("[data-search-passenger-list]");
+    const familyActionCopy = document.querySelector("[data-family-action-copy]");
+    const familyActionPrimary = document.querySelector("[data-family-action-primary]");
+    const familyActionSecondary = document.querySelector("[data-family-action-secondary]");
+    const passengerPickerCopy = document.querySelector("[data-passenger-picker-copy]");
+    const businessCard = document.querySelector("[data-business-card]");
+    const businessCardTemplate = businessCard ? businessCard.innerHTML : "";
+    const personaCardList = document.createElement("section");
+    personaCardList.className = "persona-card-list";
+    personaCardList.dataset.personaCardList = "";
+    if (businessCard) businessCard.replaceWith(personaCardList);
+    const roleSheetTitle = document.querySelector("[data-role-sheet-title]");
+    const roleSheetSubtitle = document.querySelector("[data-role-sheet-subtitle]");
+    const roleSheetBody = document.querySelector("[data-role-sheet-body]");
+    const originCity = document.querySelector("[data-origin-city]");
+    const destinationCity = document.querySelector("[data-destination-city]");
+    const travelDate = document.querySelector("[data-travel-date]");
+    const searchSheetNote = document.querySelector("[data-search-sheet] .sheet-note");
+    const confirmSearchSubtext = document.querySelector("[data-confirm-search] small");
+    const carrySummary = document.querySelector("[data-search-sheet] .carry-summary");
+    const moreLabel = document.querySelector("[data-more-label]");
+    const personaOrder = ["business", "parentChild", "elderly", "personal"];
+    let activeRoleKey = "business";
+    let activeManagerRole = null;
+    let passengerPickerContext = null;
+    let currentRoute = "北京 → 上海";
+    let selectedDate = "5月15日 周五";
+    let toastTimer = null;
+    const routeDefaults = ["北京 → 上海", "北京 → 深圳", "北京 → 成都"];
+    const searchPassengerOptions = [
+      { id: "lin-kean", name: "林可安", type: "本人", docType: "身份证", maskedNo: "1101********2468" },
+      { id: "zhou-xiaoman", name: "周小满", type: "儿童", docType: "身份证", maskedNo: "3205********1357" },
+      { id: "xu-zhiyuan", name: "许知远", type: "", docType: "身份证", maskedNo: "4403********8642" },
+      { id: "zhao-ruoning", name: "赵若宁", type: "", docType: "身份证", maskedNo: "5101********5790" }
+    ];
+    let selectedSearchPassengerIds = [];
+    let draftSearchPassengerIds = [];
+    const flightPreferenceOptions = [
+      { key: "steady", title: "准点稳妥", desc: "优先展示稳定航班", homeLabel: "准点稳妥" },
+      { key: "direct", title: "直飞少中转", desc: "少转机少折腾", homeLabel: "直飞少中转" },
+      { key: "flexibleChange", title: "灵活改签", desc: "会议变动更好处理", homeLabel: "灵活改签" },
+      { key: "preferredAirline", title: "常坐航司", desc: "延续常用航司习惯", homeLabel: "常坐航司" },
+      { key: "hideRedEye", title: "屏蔽红眼", desc: "不影响第二天工作", homeLabel: "屏蔽红眼" },
+      { key: "wideBody", title: "宽体机优先", desc: "长航程更舒适", homeLabel: "宽体机优先" }
+    ];
+    const roleProfiles = {
+      parentChild: {
+        kind: "parentChild",
+        icon: "亲",
+        title: "我的亲子出行档案",
+        manageText: "编辑亲子档案",
+        ctaText: "搜索航班",
+        sheetTitle: "编辑亲子档案",
+        sheetSubtitle: "孩子资料和带娃偏好提前准备好",
+        readinessTitle: "下次订票少填这些",
+        prefTitle: "带娃选航偏好",
+        prefNote: "搜索时优先考虑，不隐藏其他航班",
+        family: {
+          selectedMemberId: "child-1",
+          tipsAcknowledged: false,
+          members: [
+            { id: "adult-1", name: "张伟", docType: "身份证", docNo: "110101198805151234", birthDate: "", ready: true },
+            { id: "child-1", name: "张小宝", docType: "身份证", docNo: "110101202105151234", birthDate: "", ready: true }
+          ],
+          currentTrip: { from: "北京", to: "上海", date: "5月15日" },
+          routes: ["北京 → 上海", "北京 → 三亚", "北京 → 成都"],
+          deals: [
+            { route: "北京 → 三亚", date: "7月12日 周日", price: "¥680起" },
+            { route: "北京 → 厦门", date: "7月18日 周六", price: "¥520起" }
+          ],
+          preferences: ["dayFlight", "direct"]
+        },
+        prefs: [
+          { key: "dayFlight", title: "白天航班", desc: "不打乱作息", selected: true },
+          { key: "direct", title: "直飞少中转", desc: "少折腾", selected: true },
+          { key: "arrivalNotLate", title: "到达不太晚", desc: "方便接送和休息", selected: false },
+          { key: "moderateDuration", title: "飞行时长适中", desc: "孩子更容易坚持", selected: false }
+        ],
+        modules: [
+          { type: "familyMembers", title: "本次出行成员" },
+          { type: "prefs", title: "带娃选航偏好" },
+          { type: "familyTips", title: "带娃出行贴士" }
+        ]
+      },
+      elderly: {
+        kind: "elderly",
+        icon: "长",
+        title: "我的长辈安心档案",
+        manageText: "编辑长辈档案",
+        ctaText: "用长辈模式搜航班",
+        sheetTitle: "编辑长辈档案",
+        sheetSubtitle: "大字简化、稳妥选航，长辈本人和代订都能用",
+        elderly: {
+          airline: "",
+          bookingMode: "self",
+          seniorMode: true,
+          notifyContact: "",
+          selectedTravelerId: "elder-1",
+          currentTrip: { from: "北京", to: "成都", date: "5月15日" },
+          travelers: [
+            { id: "elder-1", name: "李桂英", docType: "身份证", docNo: "110101195205151234", ready: true }
+          ],
+          services: [
+            { key: "wheelchair", title: "轮椅协助", desc: "轮椅或行动协助规则提醒", selected: false },
+            { key: "unaccompanied", title: "独自出行陪伴", desc: "记录独自出行与接送信息", selected: false },
+            { key: "priority", title: "优先登机/爱心通道", desc: "作为机场现场提醒", selected: false },
+            { key: "luggageHelp", title: "行李协助提醒", desc: "作为托运/提取行李提醒", selected: false }
+          ],
+          sync: {
+            itinerary: true,
+            arrival: false,
+            familyContact: "家人A",
+            pickupContact: "家人A",
+            emergencyContact: "已保存",
+            bigTextMode: false
+          },
+          deals: [
+            { route: "北京 → 成都", date: "6月20日 周六", price: "¥430起", tag: "白天到达" },
+            { route: "北京 → 三亚", date: "6月28日 周日", price: "¥690起", tag: "适合慢游" }
+          ]
+        },
+        readinessTitle: "出行前安心检查",
+        prefTitle: "长辈选航优先",
+        prefNote: "搜索时优先考虑，不隐藏其他航班",
+        prefs: [
+          { key: "direct", title: "直飞少中转", desc: "少折腾", selected: true },
+          { key: "daytime", title: "白天到达", desc: "方便接送和休息", selected: true },
+          { key: "arrivalTime", title: "到达不太晚", desc: "减少夜间出行", selected: false },
+          { key: "flexible", title: "退改灵活", desc: "计划变化好处理", selected: false },
+          { key: "lowPrice", title: "低价优先", desc: "时间灵活时再考虑", selected: false }
+        ],
+        routes: ["北京 → 成都", "北京 → 上海", "北京 → 三亚"],
+        modules: [
+          { type: "elderlyMode", title: "使用方式" },
+          { type: "elderlyMembers", title: "乘机资料" },
+          { type: "elderlySeniorMode", title: "长辈模式" },
+          { type: "prefs", title: "长辈选航偏好" },
+          { type: "elderlyNotify", title: "出行通知人" },
+          { type: "elderlyServiceGuide", title: "特殊服务说明" }
+        ]
+      },
+      personal: {
+        icon: "个",
+        title: "我的个人出行档案",
+        manageText: "编辑个人档案",
+        ctaText: "查低价航班",
+        sheetTitle: "编辑个人档案",
+        sheetSubtitle: "本人、出发地和选航偏好提前设好",
+        summary: [
+          ["默认乘机人", "本人"],
+          ["常用出发地", "北京"],
+          ["出行记录", "近一年去过 3 城"]
+        ],
+        readinessTitle: "个人订票准备",
+        readiness: [
+          ["本人资料", "已就绪"],
+          ["常用出发地", "已保存"],
+          ["选航偏好", "已保存"]
+        ],
+        prefTitle: "个人选航优先",
+        prefNote: "搜索时优先展示，不隐藏其他航班",
+        prefs: [
+          { key: "lowPrice", title: "低价优先", desc: "先看更划算的", selected: true },
+          { key: "flexible", title: "退改灵活", desc: "计划变化好处理", selected: true },
+          { key: "direct", title: "直飞优先", desc: "少折腾", selected: false },
+          { key: "offPeak", title: "早晚班可接受", desc: "价格合适时可看", selected: false }
+        ],
+        routeTitle: "近期特惠推荐",
+        routes: ["北京"],
+        deals: [
+          { route: "北京 → 厦门", date: "错峰低价", price: "¥420起" },
+          { route: "北京 → 成都", date: "本周低价", price: "¥390起" }
+        ],
+        modules: [
+          { type: "status", title: "基础资料", note: "只显示状态", items: [["本人资料", "已就绪"]] },
+          { type: "routes", title: "常用出发地", addText: "修改出发地" },
+          { type: "prefs", title: "个人选航偏好" }
+        ]
+      }
+    };
+    let savedProfile = {
+      voucherEnabled: true,
+      companionASelected: true,
+      companionBSelected: false,
+      flightPreferences: ["steady", "flexibleChange"],
+      defaultRoute: "北京 → 上海",
+      routes: [...routeDefaults]
+    };
+    let draftProfile = cloneProfile(savedProfile);
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    function openSheet(sheet) {
+      sheet.classList.add("open");
+    }
+
+    function closeSheets() {
+      editorSheet.classList.remove("open");
+      searchSheet.classList.remove("open");
+      roleManagerSheet.classList.remove("open");
+      familyActionSheet.classList.remove("open");
+      passengerPickerSheet.classList.remove("open");
+      searchPassengerSheet.classList.remove("open");
+    }
+
+    function getSearchPassengerById(id) {
+      return searchPassengerOptions.find((item) => item.id === id);
+    }
+
+    function getSelectedSearchPassengers() {
+      return selectedSearchPassengerIds
+        .map(getSearchPassengerById)
+        .filter(Boolean);
+    }
+
+    function renderSearchPassengerSummary() {
+      const selected = getSelectedSearchPassengers();
+      searchPassengerRow.classList.toggle("selected", selected.length > 0);
+      if (!selected.length) {
+        searchPassengerTitle.textContent = "选择乘机人";
+        searchPassengerSubtitle.textContent = "快速找到低价票";
+        searchPassengerSubtitle.hidden = false;
+        return;
+      }
+      searchPassengerTitle.textContent = selected.map((item) => item.name).join("、");
+      searchPassengerSubtitle.textContent = "";
+      searchPassengerSubtitle.hidden = true;
+    }
+
+    function renderSearchPassengerList() {
+      const selectedDraft = new Set(draftSearchPassengerIds);
+      searchPassengerList.innerHTML = searchPassengerOptions.map((passenger) => {
+        const selected = selectedDraft.has(passenger.id);
+        const tagClass = passenger.type === "儿童" ? " child" : "";
+        const tag = passenger.type ? `<span class="search-passenger-tag${tagClass}">${escapeHtml(passenger.type)}</span>` : "";
+        return `
+          <button class="search-passenger-option${selected ? " selected" : ""}" data-search-passenger="${escapeHtml(passenger.id)}">
+            <span class="select-ring" aria-hidden="true">${selected ? "✓" : ""}</span>
+            <span class="search-passenger-info">
+              <span class="search-passenger-name"><strong>${escapeHtml(passenger.name)}</strong>${tag}</span>
+              <span class="search-passenger-id">${escapeHtml(passenger.docType)} ${escapeHtml(passenger.maskedNo)}</span>
+            </span>
+            <span class="passenger-edit-button" data-search-passenger-edit="${escapeHtml(passenger.id)}" aria-label="编辑${escapeHtml(passenger.name)}">✎</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function openSearchPassengerSheet() {
+      draftSearchPassengerIds = [...selectedSearchPassengerIds];
+      renderSearchPassengerList();
+      openSheet(searchPassengerSheet);
+    }
+
+    function toggleSearchPassenger(passengerId) {
+      const exists = draftSearchPassengerIds.includes(passengerId);
+      draftSearchPassengerIds = exists
+        ? draftSearchPassengerIds.filter((id) => id !== passengerId)
+        : [...draftSearchPassengerIds, passengerId];
+      renderSearchPassengerList();
+    }
+
+    function getSearchPassengerCarrySummary() {
+      const selected = getSelectedSearchPassengers();
+      return selected.length ? `已选${selected.length}位乘机人` : "乘机人可先选";
+    }
+
+    function hasProfileChanges() {
+      return JSON.stringify(savedProfile) !== JSON.stringify(draftProfile);
+    }
+
+    function requestCloseSheets() {
+      closeSheets();
+    }
+
+    function cloneProfile(profile) {
+      return {
+        voucherEnabled: profile.voucherEnabled,
+        companionASelected: profile.companionASelected,
+        companionBSelected: profile.companionBSelected,
+        flightPreferences: [...profile.flightPreferences],
+        defaultRoute: profile.defaultRoute,
+        routes: [...profile.routes]
+      };
+    }
+
+    function cloneRoleProfile(profile) {
+      return JSON.parse(JSON.stringify(profile));
+    }
+
+    let roleDraft = null;
+
+    function getSelectedPrefs(profile) {
+      return profile.prefs.filter((item) => item.selected);
+    }
+
+    function getStatusTone(status) {
+      if (status.includes("待完善") || status.includes("待确认") || status.includes("未添加") || status.includes("即将过期") || status.includes("暂不可乘机") || status.includes("临界提醒") || status.includes("需确认")) return "warning";
+      if (status.includes("未开启") || status.includes("待设置") || status.includes("未选择") || status.includes("可设置") || status.includes("可开启") || status.includes("可提醒") || status.includes("本人") || status.includes("保存后提示") || status.includes("填写出生日期后提示")) return "neutral";
+      return "ready";
+    }
+
+    function getStatusMark(tone) {
+      if (tone === "warning") return "!";
+      if (tone === "neutral") return "·";
+      return "✓";
+    }
+
+    function getMainSearchTrip() {
+      const routeCities = [...document.querySelectorAll(".search-card .route-row span")]
+        .map((item) => item.textContent.trim())
+        .filter((text) => text && text !== "⇄");
+      const dateText = document.querySelector(".search-card .date-row span")?.childNodes?.[0]?.textContent?.trim()
+        || document.querySelector(".search-card .date-row span")?.textContent?.trim()
+        || "5月15日";
+      return {
+        from: routeCities[0] || "北京",
+        to: routeCities[1] || "上海",
+        date: dateText || "5月15日"
+      };
+    }
+
+    function syncFamilyTrip(profile) {
+      if (!profile.family) return;
+      profile.family.currentTrip = getMainSearchTrip();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    function parseBirthDate(value) {
+      if (!value) return null;
+      const parsed = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(parsed.getTime())) return null;
+      return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+    }
+
+    function resolveFamilyTravelDate(family) {
+      const dateText = family.currentTrip?.date || "5月15日";
+      const match = dateText.match(/(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日/);
+      const today = new Date();
+      if (!match) return new Date(today.getFullYear(), 4, 15);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      const explicitYear = match[1] ? Number(match[1]) : null;
+      const baseYear = explicitYear || today.getFullYear();
+      const travelDate = new Date(baseYear, month - 1, day);
+      const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      if (!explicitYear && travelDate < todayOnly) travelDate.setFullYear(baseYear + 1);
+      return travelDate;
+    }
+
+    function addYears(date, years) {
+      return new Date(date.getFullYear() + years, date.getMonth(), date.getDate());
+    }
+
+    function dayDiff(fromDate, toDate) {
+      const start = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+      const end = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+      return Math.floor((end - start) / 86400000);
+    }
+
+    function getFullYearsAt(birthDate, travelDate) {
+      let years = travelDate.getFullYear() - birthDate.getFullYear();
+      const birthdayThisYear = new Date(travelDate.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+      if (travelDate < birthdayThisYear) years -= 1;
+      return Math.max(years, 0);
+    }
+
+    function getFullMonthsAt(birthDate, travelDate) {
+      let months = (travelDate.getFullYear() - birthDate.getFullYear()) * 12 + travelDate.getMonth() - birthDate.getMonth();
+      if (travelDate.getDate() < birthDate.getDate()) months -= 1;
+      return Math.max(months, 0);
+    }
+
+    function formatFamilyAge(years, months) {
+      if (years >= 1) return `${years}岁`;
+      return `${Math.max(months, 0)}个月`;
+    }
+
+    function parseCompactBirthDate(raw) {
+      if (!raw) return null;
+      const digits = raw.replace(/\D/g, "");
+      if (digits.length !== 8) return null;
+      const year = Number(digits.slice(0, 4));
+      const month = Number(digits.slice(4, 6));
+      const day = Number(digits.slice(6, 8));
+      const parsed = new Date(year, month - 1, day);
+      if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) return null;
+      return parsed;
+    }
+
+    function getMemberBirthDate(member) {
+      if (!member) return null;
+      if (member.docType === "护照") return parseBirthDate(member.birthDate);
+      const docNo = (member.docNo || "").trim();
+      if (!docNo) return null;
+      const digits = docNo.replace(/\D/g, "");
+      if (member.docType === "身份证") {
+        if (digits.length === 15) return parseCompactBirthDate(`19${digits.slice(6, 12)}`);
+        if (digits.length >= 18) return parseCompactBirthDate(digits.slice(6, 14));
+      }
+      const embeddedBirth = docNo.match(/(?:19|20)\d{2}[-/.年]?(?:0[1-9]|1[0-2])[-/.月]?(?:0[1-9]|[12]\d|3[01])日?/);
+      if (embeddedBirth) return parseCompactBirthDate(embeddedBirth[0]);
+      const compactBirth = docNo.match(/(?:19|20)\d{6}/);
+      if (compactBirth) return parseCompactBirthDate(compactBirth[0]);
+      return null;
+    }
+
+    function calculateMemberTicketInfo(member, family) {
+      const birthDate = getMemberBirthDate(member);
+      if (!birthDate) {
+        return {
+          type: "unknown",
+          tone: "warning",
+          ageText: "待判定",
+          typeText: "待判定",
+          ticketText: "补全证件后判定票型",
+          summary: "补全证件后判定票型",
+          status: "待完善",
+          detail: member?.docType === "护照" ? "护照需补填出生日期" : "证件号会用于自动解析出生日期"
+        };
+      }
+      const travelDate = resolveFamilyTravelDate(family);
+      const travelDays = dayDiff(birthDate, travelDate);
+      if (travelDays < 14) {
+        return {
+          type: "unavailable",
+          tone: "warning",
+          ageText: "未满14天",
+          typeText: "婴儿",
+          ticketText: "暂不可乘机",
+          summary: "未满14天 · 暂不可乘机",
+          status: "暂不可乘机",
+          detail: "未满14天暂不可乘机"
+        };
+      }
+      const years = getFullYearsAt(birthDate, travelDate);
+      const months = getFullMonthsAt(birthDate, travelDate);
+      const ageLabel = formatFamilyAge(years, months);
+      const daysToTwo = dayDiff(travelDate, addYears(birthDate, 2));
+      const daysToTwelve = dayDiff(travelDate, addYears(birthDate, 12));
+      if (years < 2) {
+        const boundary = daysToTwo >= 0 && daysToTwo < 31;
+        return {
+          type: "infant",
+          tone: boundary ? "warning" : "ready",
+          ageText: ageLabel,
+          typeText: "婴儿",
+          ticketText: boundary ? "满2岁后需改购儿童票" : "婴儿票",
+          summary: boundary ? `婴儿${ageLabel} · 满2岁后需改购儿童票` : `婴儿${ageLabel} · 婴儿票`,
+          status: boundary ? "临界提醒" : "已提示",
+          detail: "婴儿票(全价10%,不占座,需成人抱)"
+        };
+      }
+      if (years < 12) {
+        const boundary = daysToTwelve >= 0 && daysToTwelve < 31;
+        return {
+          type: "child",
+          tone: boundary ? "warning" : "ready",
+          ageText: ageLabel,
+          typeText: "儿童",
+          ticketText: boundary ? "满12岁后需按成人票购买" : "购儿童票",
+          summary: boundary ? `儿童${ageLabel} · 满12岁后需按成人票购买` : `儿童${ageLabel} · 购儿童票`,
+          status: boundary ? "临界提醒" : "已提示",
+          detail: "儿童票(全价50%,单独占座)"
+        };
+      }
+      return {
+        type: "adult",
+        tone: "neutral",
+        ageText: "成人",
+        typeText: "成人",
+        ticketText: "按成人票购买",
+        summary: "成人 · 按成人票",
+        status: "已提示",
+        detail: "满12周岁按成人票购买"
+      };
+    }
+
+    function getFamilyMemberSortRank(member) {
+      const order = { adult: 0, child: 1, unknown: 2, unavailable: 2, infant: 3 };
+      return order[member.type] ?? 4;
+    }
+
+    function sortFamilyMembers(members) {
+      return [...members].sort((a, b) => getFamilyMemberSortRank(a) - getFamilyMemberSortRank(b));
+    }
+
+    function getFamilyMembers(profile) {
+      return profile.family?.members || [];
+    }
+
+    function isMemberReady(member, family) {
+      const ticketInfo = calculateMemberTicketInfo(member, family);
+      const hasBirth = Boolean(getMemberBirthDate(member));
+      const hasDoc = Boolean((member.docNo || "").trim());
+      const passportBirthReady = member.docType !== "护照" || Boolean(member.birthDate);
+      return Boolean((member.name || "").trim())
+        && Boolean(member.docType)
+        && hasDoc
+        && hasBirth
+        && passportBirthReady
+        && ticketInfo.type !== "unavailable";
+    }
+
+    function refreshFamilyDerived(profile) {
+      if (!profile.family) return;
+      const family = profile.family;
+      family.members = family.members || [];
+      family.members.forEach((member) => {
+        const ticketInfo = calculateMemberTicketInfo(member, family);
+        member.type = ticketInfo.type;
+        member.typeText = ticketInfo.typeText;
+        member.ticketSummary = ticketInfo.summary;
+        member.ticketDetail = ticketInfo.detail;
+        member.ready = isMemberReady(member, family);
+      });
+      family.members = sortFamilyMembers(family.members);
+      if (!family.selectedMemberId && family.members.length) family.selectedMemberId = family.members[0].id;
+      if (family.selectedMemberId && !family.members.some((member) => member.id === family.selectedMemberId)) {
+        family.selectedMemberId = family.members[0]?.id || null;
+      }
+    }
+
+    function getFamilyCounts(profile) {
+      refreshFamilyDerived(profile);
+      const counts = { adult: 0, child: 0, infant: 0, unknown: 0, total: 0 };
+      getFamilyMembers(profile).forEach((member) => {
+        counts.total += 1;
+        if (member.type === "adult") counts.adult += 1;
+        else if (member.type === "child") counts.child += 1;
+        else if (member.type === "infant") counts.infant += 1;
+        else counts.unknown += 1;
+      });
+      return counts;
+    }
+
+    function getFamilyMemberText(profile) {
+      const counts = getFamilyCounts(profile);
+      if (!counts.total) return "未添加成员";
+      const pieces = [];
+      if (counts.adult) pieces.push(`成人${counts.adult}`);
+      if (counts.child) pieces.push(`儿童${counts.child}`);
+      if (counts.infant) pieces.push(`婴儿${counts.infant}`);
+      if (counts.unknown) pieces.push(`待完善${counts.unknown}`);
+      return pieces.join(" + ");
+    }
+
+    function formatFamilyTrip(family) {
+      const trip = family.currentTrip || {};
+      if (!trip.from || !trip.to) return "待选择";
+      return `${trip.from} → ${trip.to}｜${trip.date || "待选择日期"}`;
+    }
+
+    function getChildLikeMembers(profile) {
+      refreshFamilyDerived(profile);
+      return getFamilyMembers(profile).filter((member) => member.type === "child" || member.type === "infant" || member.type === "unavailable" || member.type === "unknown");
+    }
+
+    function getFamilyTicketSummary(profile) {
+      const childLike = getChildLikeMembers(profile).filter((member) => member.type !== "adult");
+      if (!childLike.length) return { text: "添加孩子，自动判定票型", tone: "neutral" };
+      const warning = childLike.find((member) => calculateMemberTicketInfo(member, profile.family).tone === "warning");
+      if (warning) {
+        const info = calculateMemberTicketInfo(warning, profile.family);
+        return { text: info.summary, tone: info.tone };
+      }
+      const unresolved = childLike.find((member) => member.type === "unknown");
+      if (unresolved) return { text: "添加孩子，自动判定票型", tone: "neutral" };
+      if (childLike.length === 1) {
+        const info = calculateMemberTicketInfo(childLike[0], profile.family);
+        return { text: info.summary, tone: info.tone };
+      }
+      const counts = getFamilyCounts(profile);
+      const pieces = [];
+      if (counts.child) pieces.push(`儿童${counts.child}`);
+      if (counts.infant) pieces.push(`婴儿${counts.infant}`);
+      return { text: `${pieces.join("+")} · 点击查看票型`, tone: "ready" };
+    }
+
+    function validateFamilyCapacity(profile) {
+      const counts = getFamilyCounts(profile);
+      if ((counts.child || counts.infant) && counts.adult === 0) {
+        return {
+          valid: false,
+          kind: "missingAdult",
+          message: "儿童/婴儿乘机需有成人陪同，建议添加同行成人",
+          messages: ["儿童/婴儿乘机需有成人陪同，建议添加同行成人"]
+        };
+      }
+      if (counts.infant > counts.adult) {
+        return {
+          valid: false,
+          kind: "overLimit",
+          message: "婴儿数量超过成人可携带上限，需增加同行成人或咨询航司",
+          messages: ["婴儿数量超过成人可携带上限，需增加同行成人或咨询航司"]
+        };
+      }
+      if (counts.infant && counts.child > counts.adult) {
+        return {
+          valid: false,
+          kind: "overLimit",
+          message: "每位成人通常最多携带1名婴儿+1名儿童，需增加同行成人或咨询航司",
+          messages: ["每位成人通常最多携带1名婴儿+1名儿童，需增加同行成人或咨询航司"]
+        };
+      } else if (!counts.infant && counts.child > counts.adult * 2) {
+        return {
+          valid: false,
+          kind: "overLimit",
+          message: "儿童数量超过成人可携带上限，需增加同行成人或咨询航司",
+          messages: ["儿童数量超过成人可携带上限，需增加同行成人或咨询航司"]
+        };
+      }
+      return { valid: true, kind: "ok", message: "", messages: [] };
+    }
+
+    function getFamilyAdultStatus(profile) {
+      const adults = getFamilyMembers(profile).filter((member) => member.type === "adult");
+      return adults.length && adults.every((member) => member.ready) ? "已就绪" : "待完善";
+    }
+
+    function getFamilyChildStatus(profile) {
+      const childLike = getChildLikeMembers(profile);
+      if (!childLike.length) return "待完善";
+      return childLike.every((member) => member.ready) ? "已就绪" : "待完善";
+    }
+
+    function getFamilySummary(profile) {
+      refreshFamilyDerived(profile);
+      const ticketSummary = getFamilyTicketSummary(profile);
+      return [
+        ["出行成员", getFamilyMemberText(profile), null],
+        ["儿童票型", ticketSummary.text, ticketSummary.tone],
+        ["出行提示", getFamilyScenarioHint(profile), "neutral"]
+      ];
+    }
+
+    function getFamilyScenarioHint(profile) {
+      const counts = getFamilyCounts(profile);
+      if (counts.infant) return "带婴儿出行，建议提前确认值机要求";
+      if (counts.child) return "暑期亲子出行高峰，建议提前订票";
+      return "添加孩子后，为你提示带娃订票重点";
+    }
+
+    function getFamilyReadiness(profile) {
+      refreshFamilyDerived(profile);
+      const capacity = validateFamilyCapacity(profile);
+      const counts = getFamilyCounts(profile);
+      return [
+        ["成人资料", getFamilyAdultStatus(profile), "members"],
+        ["儿童资料", getFamilyChildStatus(profile), "members"],
+        ["带娃须知", profile.family?.tipsAcknowledged ? "已知悉" : "待确认", "family-tips"]
+      ];
+    }
+
+    function renderPrefSummary(items) {
+      if (!items.length) return `<span class="chip strategy">可设置</span>`;
+      return items.map((item) => `<span class="chip strategy">${item.homeLabel || item.title}</span>`).join("");
+    }
+
+    function getPreferenceOptions(roleKey) {
+      return roleKey === "business" ? flightPreferenceOptions : (roleProfiles[roleKey]?.prefs || []);
+    }
+
+    function getSelectedPreferenceKeys(roleKey) {
+      if (roleKey === "business") return savedProfile.flightPreferences;
+      return (roleProfiles[roleKey]?.prefs || []).filter((item) => item.selected).map((item) => item.key);
+    }
+
+    function getDefaultPreferenceKeys(roleKey) {
+      const defaults = {
+        business: ["steady", "flexibleChange"],
+        parentChild: ["dayFlight", "direct"],
+        elderly: ["direct", "daytime"],
+        personal: ["lowPrice", "flexible"]
+      };
+      return defaults[roleKey] || [];
+    }
+
+    function ensureSelectedPreferences(roleKey) {
+      const options = getPreferenceOptions(roleKey);
+      const validKeys = new Set(options.map((option) => option.key));
+      let selectedKeys = getSelectedPreferenceKeys(roleKey).filter((key) => validKeys.has(key));
+      if (selectedKeys.length) {
+        if (roleKey === "business") savedProfile.flightPreferences = selectedKeys;
+        return selectedKeys;
+      }
+
+      selectedKeys = getDefaultPreferenceKeys(roleKey).filter((key) => validKeys.has(key));
+      if (roleKey === "business") {
+        savedProfile.flightPreferences = selectedKeys;
+      } else if (roleProfiles[roleKey]) {
+        roleProfiles[roleKey].prefs.forEach((item) => {
+          item.selected = selectedKeys.includes(item.key);
+        });
+        if (roleProfiles[roleKey].kind === "parentChild") {
+          roleProfiles[roleKey].family.preferences = selectedKeys;
+        }
+      }
+      return selectedKeys;
+    }
+
+    function renderFirstLevelPrefSummary(roleKey) {
+      const options = getPreferenceOptions(roleKey);
+      const selectedKeys = ensureSelectedPreferences(roleKey);
+      const selectedOptions = selectedKeys
+        .map((key) => options.find((option) => option.key === key))
+        .filter(Boolean);
+      return `
+        ${selectedOptions.map((option) => `<span class="pref-chip-toggle selected">${option.homeLabel || option.title}</span>`).join("")}
+        <button class="more-pref-link" data-more-pref>更多偏好&gt;</button>
+      `;
+    }
+
+    function renderFamilySummaryLines(profile) {
+      return getFamilySummary(profile).map(([label, value, tone]) => {
+        const statusClass = tone ? ` class="summary-status ${tone}"` : "";
+        const actionAttrs = label === "儿童票型" ? ` role="button" tabindex="0" data-family-ticket-summary` : "";
+        return `<div class="summary-line"${actionAttrs}><b>${label}</b><span${statusClass}>${value}</span></div>`;
+      }).join("");
+    }
+
+    function renderReadyGrid(items) {
+      return items.map(([title, badge, target]) => {
+        const tone = getStatusTone(badge);
+        const actionAttrs = target ? ` role="button" tabindex="0" data-role-ready-target="${target}"` : "";
+        return `
+        <div class="ready-item ${tone}"${actionAttrs}>
+          <div class="ready-main">
+            <i class="ready-check ${tone}" aria-hidden="true">${getStatusMark(tone)}</i>
+            <strong>${title}</strong>
+            <span class="ready-badge ${tone}">${badge}</span>
+          </div>
+        </div>
+      `;
+      }).join("");
+    }
+
+    function renderParentChildCard(profile) {
+      syncFamilyTrip(profile);
+      return `
+        <header>
+          <div class="business-top">
+            <div class="module-title"><h2>${profile.title}</h2></div>
+            <button class="link-btn" data-open-role-manager>${profile.manageText}</button>
+          </div>
+          <div class="profile-row">
+            <div class="avatar-slot role-avatar" aria-label="${profile.title}形象占位">
+              <div class="family-avatar" aria-hidden="true">
+                <i class="adult-head"></i>
+                <i class="adult-body"></i>
+                <i class="child-head"></i>
+                <i class="child-body"></i>
+                <b class="heart">♥</b>
+              </div>
+            </div>
+            <div class="summary-list">
+              ${renderFamilySummaryLines(profile)}
+            </div>
+          </div>
+        </header>
+        <section class="ue-section compact-section">
+          <span class="compact-title">${profile.readinessTitle}</span>
+          <div class="ready-grid">${renderReadyGrid(getFamilyReadiness(profile).map((item) => {
+            if (item[0] === "儿童资料") return [...item, "members"];
+            return item;
+          }))}</div>
+        </section>
+        <section class="ue-section compact-section">
+          <div class="business-top">
+            <span class="compact-title">${profile.prefTitle}</span>
+            <span class="pref-note">${profile.prefNote}</span>
+          </div>
+          <div class="pref-row selectable">${renderFirstLevelPrefSummary("parentChild")}</div>
+        </section>
+        <section class="ue-section route-section promo-route-section">
+          <span class="compact-title">亲子特价机票</span>
+          <div class="family-deal-row">
+            ${(profile.family.deals || []).map((deal) => `
+              <button class="family-deal-card" data-family-deal-route="${deal.route}" data-family-deal-date="${deal.date}">
+                <strong>${deal.route}</strong>
+                <span class="deal-meta">
+                  <small>${deal.date}</small>
+                  <em>${deal.price}</em>
+                </span>
+              </button>
+            `).join("")}
+            <button class="route-search-button" data-role-search>${profile.ctaText}</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function resolveElderlyTravelDate(profile) {
+      return resolveFamilyTravelDate({ currentTrip: profile.elderly?.currentTrip });
+    }
+
+    function getElderlyAge(traveler, profile) {
+      const birthDate = getMemberBirthDate(traveler);
+      if (!birthDate) return null;
+      return getFullYearsAt(birthDate, resolveElderlyTravelDate(profile));
+    }
+
+    function getElderlyTravelerText(profile) {
+      const count = profile.elderly?.travelers?.length || 0;
+      return count ? `已维护 ${count} 位长辈` : "待添加长辈";
+    }
+
+    function getElderlyHealthInfo(profile, traveler = profile.elderly?.travelers?.[0]) {
+      if (!traveler) return { text: "添加后可提前维护证件、接送和同步信息", tone: "neutral" };
+      if (!traveler.ready) return { text: "证件资料待完善｜出行规则以所选航班为准", tone: "warning" };
+      return { text: "证件资料已保存｜出行规则以所选航班为准", tone: "ready" };
+    }
+
+    function getElderlyAssistanceStatus(profile) {
+      const count = (profile.elderly?.services || []).filter((item) => item.selected).length;
+      return count ? `已选${count}项` : "未选择";
+    }
+
+    function getElderlySyncStatus(profile) {
+      const sync = profile.elderly?.sync || {};
+      return sync.itinerary || sync.pickupContact || sync.emergencyContact ? "已设置" : "待设置";
+    }
+
+    function getElderlyBigTextStatus(profile) {
+      return profile.elderly?.sync?.bigTextMode ? "已开启" : "可开启";
+    }
+
+    function getElderlyBookingModeText(profile) {
+      return profile.elderly?.bookingMode === "proxy" ? "为长辈订票" : "长辈本人出行";
+    }
+
+    function getElderlySubjectText(profile) {
+      const count = profile.elderly?.travelers?.length || 0;
+      if (profile.elderly?.bookingMode === "self") return "本人";
+      return count ? `已维护 ${count} 位长辈` : "待添加长辈";
+    }
+
+    function getElderlySeniorModeStatus(profile) {
+      return profile.elderly?.seniorMode ? "已开启" : "可开启";
+    }
+
+    function getElderlyNotifyStatus(profile) {
+      return profile.elderly?.notifyContact ? "已设置" : "可设置";
+    }
+
+    function getElderlyPassengerStatus(profile) {
+      const travelers = profile.elderly?.travelers || [];
+      return travelers.length && travelers.every((traveler) => traveler.ready) ? "已就绪" : "待完善";
+    }
+
+    function getElderlySummary(profile) {
+      return [
+        ["使用方式", getElderlyBookingModeText(profile), null],
+        ["出行对象", getElderlySubjectText(profile), profile.elderly?.bookingMode === "proxy" && !profile.elderly?.travelers?.length ? "neutral" : null],
+        ["订票模式", profile.elderly?.seniorMode ? "长辈模式已开启" : "长辈模式可开启", profile.elderly?.seniorMode ? "ready" : "neutral"]
+      ];
+    }
+
+    function getElderlyReadiness(profile) {
+      return [
+        ["乘机资料", getElderlyPassengerStatus(profile), "elderly-members"],
+        ["长辈模式", getElderlySeniorModeStatus(profile), "elderly-mode"],
+        ["出行通知", getElderlyNotifyStatus(profile), "elderly-notify"]
+      ];
+    }
+
+    function renderElderlySummaryLines(profile) {
+      return getElderlySummary(profile).map(([label, value, tone]) => {
+        const statusClass = tone ? ` class="summary-status ${tone}"` : "";
+        return `<div class="summary-line"><b>${label}</b><span${statusClass}>${value}</span></div>`;
+      }).join("");
+    }
+
+    function renderElderlyCard(profile) {
+      return `
+        <header>
+          <div class="business-top">
+            <div class="module-title"><h2>${profile.title}</h2></div>
+            <button class="link-btn" data-open-role-manager>${profile.manageText}</button>
+          </div>
+          <div class="profile-row">
+            <div class="avatar-slot role-avatar" aria-label="${profile.title}形象占位"><span>${profile.icon}</span></div>
+            <div class="summary-list">
+              ${renderElderlySummaryLines(profile)}
+            </div>
+          </div>
+        </header>
+        <section class="ue-section compact-section">
+          <span class="compact-title">${profile.readinessTitle}</span>
+          <div class="ready-grid">${renderReadyGrid(getElderlyReadiness(profile))}</div>
+        </section>
+        <section class="ue-section compact-section">
+          <div class="business-top">
+            <span class="compact-title">${profile.prefTitle}</span>
+            <span class="pref-note">${profile.prefNote}</span>
+          </div>
+          <div class="pref-row selectable">${renderFirstLevelPrefSummary("elderly")}</div>
+        </section>
+        <section class="ue-section route-section promo-route-section">
+          <span class="compact-title">长辈友好推荐</span>
+          <div class="family-deal-row">
+            ${(profile.elderly.deals || []).map((deal) => `
+              <button class="family-deal-card" data-role-route="${deal.route}" data-deal-date="${deal.date}">
+                <strong>${deal.route}</strong>
+                <span class="deal-meta">
+                  <small>${deal.tag || deal.date}</small>
+                  <em>${deal.price}</em>
+                </span>
+              </button>
+            `).join("")}
+            <button class="route-search-button" data-role-search>${profile.ctaText}</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderRoleCard(roleKey) {
+      const profile = roleProfiles[roleKey];
+      if (profile.kind === "parentChild") {
+        return renderParentChildCard(profile);
+      }
+      if (profile.kind === "elderly") {
+        return renderElderlyCard(profile);
+      }
+      return `
+        <header>
+          <div class="business-top">
+            <div class="module-title"><h2>${profile.title}</h2></div>
+            <button class="link-btn" data-open-role-manager>${profile.manageText}</button>
+          </div>
+          <div class="profile-row">
+            <div class="avatar-slot role-avatar" aria-label="${profile.title}形象占位"><span>${profile.icon}</span></div>
+            <div class="summary-list">
+              ${profile.summary.map(([label, value]) => `<div class="summary-line"><b>${label}</b><span>${value}</span></div>`).join("")}
+            </div>
+          </div>
+        </header>
+        <section class="ue-section compact-section">
+          <span class="compact-title">${profile.readinessTitle}</span>
+          <div class="ready-grid">${renderReadyGrid(profile.readiness)}</div>
+        </section>
+        <section class="ue-section compact-section">
+          <div class="business-top">
+            <span class="compact-title">${profile.prefTitle}</span>
+            <span class="pref-note">${profile.prefNote}</span>
+          </div>
+          <div class="pref-row selectable">${renderFirstLevelPrefSummary(roleKey)}</div>
+        </section>
+        ${roleKey === "personal" ? `
+          <section class="ue-section route-section promo-route-section">
+            <span class="compact-title">${profile.routeTitle}</span>
+            <div class="family-deal-row">
+              ${(profile.deals || []).map((deal) => `
+                <button class="family-deal-card" data-role-route="${deal.route}" data-deal-date="${deal.date}">
+                  <strong>${deal.route}</strong>
+                  <span class="deal-meta">
+                    <small>${deal.date}</small>
+                    <em>${deal.price}</em>
+                  </span>
+                </button>
+              `).join("")}
+              <button class="route-search-button" data-role-search>${profile.ctaText}</button>
+            </div>
+          </section>
+        ` : `
+          <section class="ue-section route-section">
+            <span class="compact-title">${profile.routeTitle}</span>
+            <div class="route-search-row">
+              <div class="route-chips">
+                ${profile.routes.map((route, index) => `<button class="chip route-chip${index === 0 ? " active" : ""}" data-role-route="${route}">${route}</button>`).join("")}
+              </div>
+              <button class="route-search-button" data-role-search>${profile.ctaText}</button>
+            </div>
+          </section>
+        `}
+      `;
+    }
+
+    function getRoleTitle(roleKey) {
+      return roleKey === "business" ? "我的商旅档案" : roleProfiles[roleKey].title;
+    }
+
+    function getRoleIcon(roleKey) {
+      if (roleKey === "business") return "公";
+      return roleProfiles[roleKey]?.icon || "";
+    }
+
+    function renderExpandedRoleCard(roleKey) {
+      return roleKey === "business" ? businessCardTemplate : renderRoleCard(roleKey);
+    }
+
+    function renderPersonaCards() {
+      personaCardList.innerHTML = personaOrder.map((roleKey) => `
+        <section class="business-card persona-stack-card is-expanded" id="${roleKey}" data-persona-card="${roleKey}" aria-label="${getRoleTitle(roleKey)}">
+          ${renderExpandedRoleCard(roleKey)}
+        </section>
+      `).join("");
+      hydrateBusinessCard();
+      updatePersonaNavActive();
+    }
+
+    function updatePersonaNavActive() {
+      document.querySelectorAll("[data-role-tab]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.roleTab === activeRoleKey);
+      });
+    }
+
+    const roleHashAliases = {
+      home: "business",
+      business: "business",
+      cards: "business",
+      archive: "business",
+      profiles: "business",
+      "business-card": "business",
+      parentChild: "parentChild",
+      "parentChild-card": "parentChild",
+      family: "parentChild",
+      "family-card": "parentChild",
+      child: "parentChild",
+      elderly: "elderly",
+      "elderly-card": "elderly",
+      elder: "elderly",
+      personal: "personal",
+      "personal-card": "personal",
+      "figma-cards": "business"
+    };
+
+    const roleScrollAliases = {
+      home: { role: "business", top: 0 },
+      business: { role: "business", target: "business", offset: 0 },
+      "business-card": { role: "business", target: "business", offset: 0 },
+      archive: { role: "business", target: "business", offset: -118 },
+      profiles: { role: "business", target: "business", offset: 0 },
+      cards: { role: "business", target: "parentChild", offset: -255 },
+      parentChild: { role: "parentChild", target: "parentChild", offset: 0 },
+      "parentChild-card": { role: "parentChild", target: "parentChild", offset: 0 },
+      family: { role: "parentChild", target: "parentChild", offset: 0 },
+      "family-card": { role: "parentChild", target: "parentChild", offset: 0 },
+      child: { role: "parentChild", target: "parentChild", offset: 0 },
+      elderly: { role: "elderly", target: "elderly", offset: 0 },
+      "elderly-card": { role: "elderly", target: "elderly", offset: 0 },
+      elder: { role: "elderly", target: "elderly", offset: 0 },
+      personal: { role: "personal", target: "personal", offset: 0 },
+      "personal-card": { role: "personal", target: "personal", offset: 0 },
+      "figma-cards": { role: "business", target: "business", offset: 0, figmaCards: true }
+    };
+
+    function getRoleFromHash() {
+      const rawHash = decodeURIComponent(window.location.hash.replace(/^#/, "")).trim();
+      if (!rawHash) return "business";
+      const normalizedHash = rawHash.replace(/^role=/, "");
+      return roleHashAliases[normalizedHash] || "business";
+    }
+
+    function getHashState() {
+      const rawHash = decodeURIComponent(window.location.hash.replace(/^#/, "")).trim();
+      const normalizedHash = rawHash.replace(/^role=/, "") || "business";
+      return roleScrollAliases[normalizedHash] || { role: getRoleFromHash(), target: getRoleFromHash(), offset: 0 };
+    }
+
+    function updateRoleHash(roleKey, replace = false) {
+      const hash = `#${roleKey === "business" ? "business" : roleKey}`;
+      if (window.location.hash === hash) return;
+      if (replace) {
+        window.history.replaceState(null, "", hash);
+        return;
+      }
+      window.history.pushState(null, "", hash);
+    }
+
+    function applyRoleFromHash() {
+      const state = getHashState();
+      phone.classList.toggle("figma-cards", Boolean(state.figmaCards));
+      setRole(state.role, {
+        skipHash: true,
+        behavior: "auto",
+        targetRole: state.target,
+        offset: state.offset,
+        top: state.top
+      });
+    }
+
+    function renderRolePrefCards(profile) {
+      return `<div class="flight-pref-grid">${
+        profile.prefs.map((option) => `
+          <button class="flight-pref-card${option.selected ? " selected" : ""}" data-role-pref="${option.key}" aria-pressed="${option.selected}">
+            <strong>${option.title}</strong>
+            <span>${option.desc}</span>
+            <i class="flight-pref-check" aria-hidden="true">✓</i>
+          </button>
+        `).join("")
+      }</div>`;
+    }
+
+    function renderFamilyMembers(profile) {
+      refreshFamilyDerived(profile);
+      const family = profile.family;
+      const members = getFamilyMembers(profile);
+      const capacity = validateFamilyCapacity(profile);
+      const needsAdult = capacity.kind === "missingAdult";
+      const memberSummary = (info) => info.type === "adult" ? "成人 · 按成人票" : info.summary;
+      const memberTitle = (member, info) => {
+        const name = escapeHtml(member.name || "未填写姓名");
+        if (info.type === "child" || info.type === "infant") return `${name} · ${info.typeText}${info.ageText}`;
+        return `${name} · ${info.typeText}`;
+      };
+      return `
+        <section class="profile-panel" data-family-section="members">
+          <div class="profile-panel-head"><div><h4>本次出行成员</h4><p>从常用乘机人选择或新增，票型由证件信息自动判定</p></div></div>
+          <p class="family-trip-context">成员档案可复用，本次默认用于 <strong>${formatFamilyTrip(family)}</strong></p>
+          ${capacity.message ? `<p class="family-capacity-note">${capacity.message}</p>` : ""}
+          <div class="family-member-list">
+            ${members.length ? members.map((member) => {
+              const info = calculateMemberTicketInfo(member, family);
+              const tone = member.ready ? "ready" : "warning";
+              return `
+              <div class="family-member-row" data-family-member-sync="${member.id}">
+                <button class="family-member-main" data-family-member-sync="${member.id}">
+                  <strong>${memberTitle(member, info)}</strong>
+                  <span>${memberSummary(info)}</span>
+                </button>
+                <div class="family-member-actions">
+                  <span class="status-tag ${tone}">${member.ready ? "已就绪" : "待完善"}</span>
+                  <button class="family-member-delete" data-family-member-delete="${member.id}" aria-label="删除成员">×</button>
+                </div>
+                ${info.type === "infant" ? `<span class="family-member-risk">不占座 · 需到柜台值机 · 名额有限</span>` : ""}
+              </div>
+            `;
+            }).join("") : `<div class="family-ticket-result warning"><strong>还没有出行成员</strong><span>先添加成人和孩子，系统会自动判定票型。</span></div>`}
+          </div>
+          <div class="family-add-row">
+            <button type="button" class="${needsAdult ? "primary" : ""}" data-family-add-member="${needsAdult ? "adult" : "member"}">${needsAdult ? "+ 添加同行成人" : "+ 添加同行成员"}</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function getFamilyTips(profile) {
+      const counts = getFamilyCounts(profile);
+      const tips = [
+        { icon: "证", title: "证件需与购票一致", desc: "孩子购票、值机、安检使用同一个有效证件" }
+      ];
+      if (counts.infant) {
+        return [
+          { icon: "柜", title: "婴儿出行需柜台值机", desc: "婴儿票通常无法网上自助值机，需带出生证明/户口本办理" },
+          { icon: "婴", title: "婴儿票建议尽早预订", desc: "每班名额有限(约占5%)，需与成人同订、不能单独购买" },
+          ...tips,
+          { icon: "车", title: "婴儿车可推到登机口", desc: "折叠后交机组托运，不占行李额，落地原地领取" },
+          { icon: "餐", title: "儿童餐/婴儿摇篮", desc: "出票后联系航司申请，数量有限，以航司实际提供为准" }
+        ];
+      }
+      if (counts.child) {
+        return [
+          ...tips,
+          { icon: "餐", title: "儿童餐申请", desc: "如需儿童餐，出票后联系航司申请，以航司实际提供为准" }
+        ];
+      }
+      return tips;
+    }
+
+    function renderFamilyTips(profile) {
+      const tips = getFamilyTips(profile);
+      return `
+        <section class="profile-panel" data-family-section="family-tips">
+          <div class="profile-panel-head">
+            <div><h4>带娃出行贴士</h4><p>只做出行提醒，不作为订票承诺</p></div>
+          </div>
+          <div class="family-tips-list">
+            ${tips.map((tip) => `
+              <div class="family-tip-row">
+                <span class="family-tip-icon" aria-hidden="true">${tip.icon}</span>
+                <span class="family-tip-copy"><strong>${tip.title}</strong><span>${tip.desc}</span></span>
+              </div>
+            `).join("")}
+          </div>
+          <button class="family-tip-confirm${profile.family?.tipsAcknowledged ? " done" : ""}" data-family-tips-confirm>
+            ${profile.family?.tipsAcknowledged ? "已了解带娃须知 ✓" : "我已了解"}
+          </button>
+        </section>
+      `;
+    }
+
+    function renderElderlyMode(profile) {
+      const mode = profile.elderly?.bookingMode || "self";
+      return `
+        <section class="profile-panel" data-family-section="elderly-booking">
+          <div class="profile-panel-head"><div><h4>使用方式</h4><p>长辈本人订票和家人代订都能使用这套档案</p></div></div>
+          <div class="elderly-mode-choice" role="group" aria-label="长辈档案使用方式">
+            <button class="${mode === "self" ? "active" : ""}" data-elderly-booking-mode="self">长辈本人出行</button>
+            <button class="${mode === "proxy" ? "active" : ""}" data-elderly-booking-mode="proxy">为长辈订票</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderElderlySeniorMode(profile) {
+      const enabled = Boolean(profile.elderly?.seniorMode);
+      return `
+        <section class="profile-panel" data-family-section="elderly-mode">
+          <div class="profile-panel-head"><div><h4>长辈模式</h4><p>开启后，搜索、列表、确认页使用更大字号和更少干扰信息。</p></div></div>
+          <div class="setting-row">
+            <div class="setting-main"><strong>长辈模式</strong><span>${enabled ? "已开启" : "可开启"}</span></div>
+            <button class="toggle-switch" data-elderly-senior-mode-toggle aria-label="长辈模式" aria-pressed="${enabled}"></button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderElderlyNotify(profile) {
+      const contact = profile.elderly?.notifyContact || "";
+      return `
+        <section class="profile-panel" data-family-section="elderly-notify">
+          <div class="profile-panel-head"><div><h4>出行通知人</h4><p>可选。出票后用于发送行程和航班动态，不作为接送服务承诺。</p></div></div>
+          <div class="setting-row">
+            <div class="setting-main"><strong>通知人</strong><span>${contact ? "已设置" : "未设置"}</span></div>
+            <button class="mini-link" data-elderly-notify-edit>编辑</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderElderlyServiceGuide(profile) {
+      const guides = [
+        ["轮椅协助", "需按实际承运航司/机场规则办理"],
+        ["无陪老人", "仅部分航司/航线支持，需提前联系航司"],
+        ["爱心通道", "以机场现场保障为准"],
+        ["行李协助", "以航司/机场实际提供为准"]
+      ];
+      return `
+        <section class="profile-panel" data-family-section="elderly-service-guide">
+          <div class="profile-panel-head"><div><h4>特殊服务说明</h4><p>仅做规则提醒，不作为平台申请承诺。</p></div></div>
+          <div class="guide-list">
+            ${guides.map(([title, desc]) => `<div class="guide-card"><strong>${title}</strong><span>${desc}</span></div>`).join("")}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderElderlyMembers(profile) {
+      const travelers = profile.elderly?.travelers || [];
+      return `
+        <section class="profile-panel" data-family-section="elderly-members">
+          <div class="profile-panel-head"><div><h4>乘机资料</h4><p>从常用乘机人选择，证件资料用于购票和值机确认</p></div></div>
+          <div class="family-member-list">
+            ${travelers.length ? travelers.map((traveler) => {
+              const age = getElderlyAge(traveler, profile);
+              const tone = traveler.ready ? "ready" : "warning";
+              return `
+                <div class="family-member-row" data-elderly-member-sync="${traveler.id}">
+                  <button class="family-member-main" data-elderly-member-sync="${traveler.id}">
+                    <strong>${escapeHtml(traveler.name)} · ${age === null ? "年龄待确认" : `${age}岁`}</strong>
+                    <span>${traveler.ready ? "证件资料已保存" : "证件资料待完善"}｜出行规则以所选航班为准</span>
+                  </button>
+                  <div class="family-member-actions">
+                    <span class="status-tag ${tone}">${traveler.ready ? "已就绪" : "待完善"}</span>
+                    <button class="family-member-delete" data-elderly-member-delete="${traveler.id}" aria-label="删除长辈">×</button>
+                  </div>
+                </div>
+              `;
+            }).join("") : `<div class="family-ticket-result warning"><strong>还没有乘机资料</strong><span>添加后可提前维护证件信息，订票时直接带入。</span></div>`}
+          </div>
+          <div class="family-add-row">
+            <button data-elderly-add>+ 添加长辈</button>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderElderlyServices(profile) {
+      return renderElderlyServiceGuide(profile);
+    }
+
+    function renderElderlySync(profile) {
+      return renderElderlyNotify(profile);
+    }
+
+    function renderRoleManagerSection(section, profile) {
+      if (section.type === "familyMembers") return renderFamilyMembers(profile);
+      if (section.type === "familyTips") return renderFamilyTips(profile);
+      if (section.type === "elderlyMode") return renderElderlyMode(profile);
+      if (section.type === "elderlyMembers") return renderElderlyMembers(profile);
+      if (section.type === "elderlySeniorMode") return renderElderlySeniorMode(profile);
+      if (section.type === "elderlyNotify") return renderElderlyNotify(profile);
+      if (section.type === "elderlyServiceGuide") return renderElderlyServiceGuide(profile);
+      if (section.type === "elderlyServices") return renderElderlyServices(profile);
+      if (section.type === "elderlySync") return renderElderlySync(profile);
+      if (section.type === "tiles") {
+        return `
+          <section class="profile-panel">
+            <div class="profile-panel-head"><div><h4>${section.title}</h4></div></div>
+            <div class="passenger-grid">${section.items.map((item, index) =>
+              `<button class="passenger-tile${index === 0 ? " selected" : ""}${item.startsWith("+") ? " add" : ""}" data-role-placeholder><strong>${item}</strong></button>`
+            ).join("")}</div>
+          </section>
+        `;
+      }
+      if (section.type === "status") {
+        return `
+          <section class="profile-panel">
+            <div class="profile-panel-head panel-head-inline">
+              <h4>${section.title}</h4>
+              ${section.note ? `<p class="panel-inline-note">${section.note}</p>` : ""}
+            </div>
+            <div class="data-stack">
+              ${section.items.map(([title, status]) => `
+                <div class="data-card">
+                  <div class="data-title"><span>${title}</span><span class="status-tag ${getStatusTone(status)}">${status}</span></div>
+                </div>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }
+      if (section.type === "toggles") {
+        return `
+          <section class="profile-panel">
+            <div class="profile-panel-head"><div><h4>${section.title}</h4></div></div>
+            ${section.items.map(([title, status]) => {
+              const canToggle = !status.includes("添加") && !status.includes("联系人");
+              const isOn = status.includes("已开启");
+              return `
+              <div class="setting-row">
+                <div class="setting-main"><strong>${title}</strong><span>${status}</span></div>
+                ${canToggle ? `<button class="toggle-switch" data-role-toggle aria-label="${title}" aria-pressed="${isOn}"></button>` : `<button class="mini-link" data-role-placeholder>添加</button>`}
+              </div>
+            `;
+            }).join("")}
+          </section>
+        `;
+      }
+      if (section.type === "prefs") {
+        return `
+          <section class="profile-panel" data-family-section="prefs">
+            <div class="profile-panel-head"><div><h4>${section.title}</h4><p>${profile.prefNote}</p></div></div>
+            <div class="preference-block">${renderRolePrefCards(profile)}</div>
+          </section>
+        `;
+      }
+      if (section.type === "routes") {
+        return `
+          <section class="profile-panel">
+            <div class="profile-panel-head"><div><h4>${section.title}</h4></div></div>
+            <div class="compact-routes">
+              ${profile.routes.map((route, index) => `<button class="compact-route${index === 0 ? " default" : ""}" data-role-manager-route="${route}">${route}</button>`).join("")}
+              <button class="compact-route" data-role-placeholder>${section.addText}</button>
+            </div>
+          </section>
+        `;
+      }
+      return "";
+    }
+
+    function renderRoleManager(roleKey) {
+      const profile = roleDraft || roleProfiles[roleKey];
+      roleSheetTitle.textContent = profile.sheetTitle;
+      roleSheetSubtitle.textContent = profile.sheetSubtitle;
+      roleSheetBody.innerHTML = profile.modules.map((section) => renderRoleManagerSection(section, profile)).join("");
+    }
+
+    function getHomePrefLabels(profile) {
+      return profile.flightPreferences
+        .map((key) => flightPreferenceOptions.find((item) => item.key === key)?.homeLabel)
+        .filter(Boolean)
+        .slice(0, 4);
+    }
+
+    function renderFlightPreferenceCards() {
+      const grid = document.querySelector("[data-flight-pref-grid]");
+      grid.innerHTML = flightPreferenceOptions.map((option) => {
+        const selected = draftProfile.flightPreferences.includes(option.key);
+        return `
+          <button class="flight-pref-card${selected ? " selected" : ""}" data-flight-pref="${option.key}" aria-pressed="${selected}">
+            <strong>${option.title}</strong>
+            <span>${option.desc}</span>
+            <i class="flight-pref-check" aria-hidden="true">✓</i>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function renderHomeRoutes() {
+      const routeContainer = document.querySelector("[data-route-chips]");
+      if (!routeContainer) return;
+      const orderedRoutes = [
+        savedProfile.defaultRoute,
+        ...savedProfile.routes.filter((route) => route !== savedProfile.defaultRoute)
+      ];
+      routeContainer.innerHTML = orderedRoutes.map((route, index) =>
+        `<button class="chip route-chip${index === 0 ? " active" : ""}" data-route="${route}">${route}</button>`
+      ).join("");
+    }
+
+    function hydrateBusinessCard() {
+      const airlineSummary = document.querySelector("[data-airline-summary]");
+      if (airlineSummary) airlineSummary.textContent = "国航 / 东航";
+      const companionCount = [savedProfile.companionASelected, savedProfile.companionBSelected].filter(Boolean).length;
+      const companionSummary = document.querySelector("[data-companion-summary]");
+      if (!companionSummary) return;
+      const companionItem = companionSummary.closest(".ready-item");
+      const companionCheck = companionItem.querySelector(".ready-check");
+      const noCompanion = companionCount === 0;
+      companionSummary.textContent = noCompanion ? "未选择" : `${companionCount}位`;
+      companionItem.classList.toggle("neutral", noCompanion);
+      companionSummary.classList.toggle("neutral", noCompanion);
+      companionCheck.classList.toggle("neutral", noCompanion);
+      companionCheck.textContent = noCompanion ? "•" : "✓";
+      const prefContainer = document.querySelector("[data-pref-summary]");
+      prefContainer.innerHTML = renderFirstLevelPrefSummary("business");
+      renderHomeRoutes();
+    }
+
+    function renderHomeProfile() {
+      renderPersonaCards();
+    }
+
+    function renderEditorDraft() {
+      const voucherToggle = document.querySelector("[data-voucher-toggle]");
+      voucherToggle.setAttribute("aria-pressed", String(draftProfile.voucherEnabled));
+      document.querySelector("[data-voucher-status]").textContent = draftProfile.voucherEnabled ? "行程结束后 7 个工作日内自动发送至 gaop****@xxx.com" : "已关闭，本次不自动发送";
+
+      document.querySelector("[data-companion-a]").classList.toggle("selected", draftProfile.companionASelected);
+      document.querySelector("[data-companion-b]").classList.toggle("selected", draftProfile.companionBSelected);
+
+      renderFlightPreferenceCards();
+      document.querySelectorAll("[data-editor-route]").forEach((button) => {
+        const isDefault = button.dataset.editorRoute === draftProfile.defaultRoute;
+        button.classList.toggle("default", isDefault);
+      });
+    }
+
+    function openProfileEditor(targetSection) {
+      draftProfile = cloneProfile(savedProfile);
+      renderEditorDraft();
+      openSheet(editorSheet);
+      if (typeof targetSection !== "string") return;
+      setTimeout(() => {
+        const target = editorSheet.querySelector(`[data-editor-section="${targetSection}"]`);
+        if (target) target.scrollIntoView({ block: "start" });
+      }, 0);
+    }
+
+    function saveProfileDraft() {
+      savedProfile = cloneProfile(draftProfile);
+      renderHomeProfile();
+    }
+
+    function parseRoute(route) {
+      const [origin = "北京", destination = "上海"] = route.split("→").map((item) => item.trim());
+      return { origin, destination };
+    }
+
+    function renderRoute(route) {
+      const { origin, destination } = parseRoute(route);
+      originCity.textContent = origin;
+      destinationCity.textContent = destination;
+      currentRoute = `${origin} → ${destination}`;
+    }
+
+    function resetTravelDate() {
+      selectedDate = "5月15日 周五";
+      travelDate.textContent = selectedDate;
+    }
+
+    function resetTripType() {
+      document.querySelectorAll("[data-trip-type]").forEach((item) => item.classList.remove("active"));
+      document.querySelector("[data-trip-type='single']").classList.add("active");
+    }
+
+    function openSearchSheet() {
+      renderRoute(currentRoute || "北京 → 上海");
+      resetTravelDate();
+      resetTripType();
+      searchSheet.classList.remove("senior-mode");
+      if (activeRoleKey === "business") {
+        carrySummary.innerHTML = `<span>${getSearchPassengerCarrySummary()}</span><span>报销已填</span><span>偏好已选</span>`;
+        searchSheetNote.textContent = "只调整排序，不隐藏其他航班";
+        confirmSearchSubtext.textContent = "已按商旅偏好排序";
+      } else if (activeRoleKey === "parentChild") {
+        const profile = roleProfiles.parentChild;
+        refreshFamilyDerived(profile);
+        const ticketInfo = getFamilyTicketSummary(profile);
+        const prefText = getSelectedPrefs(profile).map((item) => item.title.replace("少中转", "")).slice(0, 3).join(" / ") || "带娃偏好";
+        carrySummary.innerHTML = `<span>${getFamilyMemberText(profile)}</span><span>${ticketInfo.text}</span><span>带娃偏好已选</span>`;
+        searchSheetNote.textContent = `搜索时优先考虑：${prefText}`;
+        confirmSearchSubtext.textContent = "不隐藏其他航班";
+      } else if (activeRoleKey === "elderly") {
+        const profile = roleProfiles.elderly;
+        const seniorModeText = profile.elderly?.seniorMode ? "长辈模式已开启" : "长辈模式可开启";
+        const passengerText = getElderlyPassengerStatus(profile) === "已就绪" ? "乘机资料已就绪" : "乘机资料待完善";
+        const notifyText = profile.elderly?.notifyContact ? "出行通知已设置" : "出行通知可设置";
+        carrySummary.innerHTML = `<span>${seniorModeText}</span><span>${passengerText}</span><span>${notifyText}</span>`;
+        searchSheetNote.textContent = "搜索时优先考虑：直飞 / 白天到达";
+        confirmSearchSubtext.textContent = "进入列表后按长辈选航优先展示";
+        if (profile.elderly?.seniorMode) searchSheet.classList.add("senior-mode");
+      } else if (activeRoleKey === "personal") {
+        carrySummary.innerHTML = "<span>本人资料已带入</span><span>常用出发地 北京</span><span>低价优先已选</span>";
+        searchSheetNote.textContent = "搜索时优先展示：低价 / 退改灵活";
+        confirmSearchSubtext.textContent = "进入列表后可继续调整排序";
+      } else {
+        carrySummary.innerHTML = "<span>资料已填</span><span>偏好已选</span>";
+        searchSheetNote.textContent = "搜索时会参考当前出行偏好";
+        confirmSearchSubtext.textContent = "已按当前偏好展示";
+      }
+      openSheet(searchSheet);
+    }
+
+    function setRole(roleKey, options = {}) {
+      const safeRoleKey = personaOrder.includes(roleKey) ? roleKey : "business";
+      const scrollBehavior = options.behavior || "smooth";
+      roleKey = safeRoleKey;
+      activeRoleKey = roleKey;
+      updatePersonaNavActive();
+      if (!options.skipHash) updateRoleHash(roleKey);
+      requestAnimationFrame(() => {
+        const targetRole = options.targetRole || roleKey;
+        const target = personaCardList.querySelector(`[data-persona-card="${targetRole}"]`);
+        const scrollToTarget = () => {
+          if (!phoneScroll) return;
+          if (Number.isFinite(options.top)) {
+            phoneScroll.scrollTo({ top: Math.max(options.top, 0), behavior: scrollBehavior });
+            return;
+          }
+          if (!target) return;
+          const targetRect = target.getBoundingClientRect();
+          const scrollRect = phoneScroll.getBoundingClientRect();
+          const top = phoneScroll.scrollTop + targetRect.top - scrollRect.top + (options.offset || 0);
+          phoneScroll.scrollTo({ top: Math.max(top, 0), behavior: scrollBehavior });
+        };
+        scrollToTarget();
+        setTimeout(scrollToTarget, 80);
+        setTimeout(scrollToTarget, 260);
+      });
+    }
+
+    function openRoleManager(roleKey, targetSection) {
+      activeManagerRole = roleKey;
+      roleDraft = cloneRoleProfile(roleProfiles[activeManagerRole]);
+      renderRoleManager(activeManagerRole);
+      openSheet(roleManagerSheet);
+      if (targetSection) {
+        const target = roleSheetBody.querySelector(`[data-family-section="${targetSection}"]`);
+        if (target) target.scrollIntoView({ block: "start" });
+      }
+    }
+
+    function applyFamilyRoute(route, dateText = "") {
+      const profile = roleProfiles.parentChild;
+      const { origin, destination } = parseRoute(route);
+      const trip = getMainSearchTrip();
+      profile.family.currentTrip = { from: origin, to: destination, date: dateText || trip.date || "5月15日" };
+      currentRoute = `${origin} → ${destination}`;
+    }
+
+    function openParentChildSearchSheet(options = {}) {
+      const profile = roleProfiles.parentChild;
+      if (!options.keepTrip) syncFamilyTrip(profile);
+      currentRoute = profile.family.currentTrip?.from && profile.family.currentTrip?.to
+        ? `${profile.family.currentTrip.from} → ${profile.family.currentTrip.to}`
+        : "北京 → 上海";
+      activeRoleKey = "parentChild";
+      openSearchSheet();
+      if (profile.family.currentTrip?.date) {
+        selectedDate = profile.family.currentTrip.date;
+        travelDate.textContent = selectedDate;
+      }
+    }
+
+    function openFamilyActionPrompt(message, primaryText, targetSection, options = {}) {
+      familyActionCopy.textContent = message;
+      familyActionPrimary.textContent = primaryText;
+      familyActionPrimary.dataset.targetSection = targetSection || "members";
+      familyActionPrimary.dataset.action = options.primaryAction || "manager";
+      familyActionPrimary.dataset.keepTrip = options.keepTrip ? "true" : "";
+      familyActionSecondary.textContent = options.secondaryText || "继续搜索";
+      familyActionSecondary.dataset.action = options.secondaryAction || "search";
+      familyActionSecondary.dataset.keepTrip = options.keepTrip ? "true" : "";
+      openSheet(familyActionSheet);
+    }
+
+    function handleParentChildSearch(options = {}) {
+      const profile = roleProfiles.parentChild;
+      if (!options.keepTrip) syncFamilyTrip(profile);
+      refreshFamilyDerived(profile);
+      const trip = profile.family.currentTrip || {};
+      if (!trip.from || !trip.to) {
+        openParentChildSearchSheet(options);
+        return;
+      }
+      const counts = getFamilyCounts(profile);
+      const childLike = getChildLikeMembers(profile).filter((member) => member.type !== "adult");
+      const incompleteChildren = childLike.filter((member) => !member.ready);
+      const capacity = validateFamilyCapacity(profile);
+      if (counts.total === 0 || childLike.length === 0) {
+        openFamilyActionPrompt("还未添加儿童资料，建议先添加后再搜索", "添加儿童", "members", { secondaryText: "仍要搜索", keepTrip: options.keepTrip });
+        return;
+      }
+      if (capacity.kind === "missingAdult") {
+        openFamilyActionPrompt("按民航规定，儿童/婴儿购票乘机需有成人陪同同行，请先添加同行成人", "去添加成人", "members", {
+          primaryAction: "addAdult",
+          secondaryText: "返回",
+          secondaryAction: "close",
+          keepTrip: options.keepTrip
+        });
+        return;
+      }
+      if (!capacity.valid) {
+        openFamilyActionPrompt(`${capacity.messages.join("；")}。建议先调整成员`, "去完善", "members", { secondaryText: "仍要搜索", keepTrip: options.keepTrip });
+        return;
+      }
+      const unavailable = childLike.find((member) => calculateMemberTicketInfo(member, profile.family).type === "unavailable");
+      if (unavailable) {
+        openFamilyActionPrompt("有婴儿未满14天暂不可乘机，建议先调整成员或出行日期", "去完善", "members", { secondaryText: "仍要搜索", keepTrip: options.keepTrip });
+        return;
+      }
+      if (incompleteChildren.length) {
+        openFamilyActionPrompt("儿童资料待完善，补全后避免到机场无法值机", "去完善", "members", { secondaryText: "仍要搜索", keepTrip: options.keepTrip });
+        return;
+      }
+      if (counts.infant) {
+        openFamilyActionPrompt("婴儿票名额有限(约占航班5%)，建议尽早预订；婴儿票不能单独购买，需与成人同订", "继续搜索", "members", {
+          primaryAction: "search",
+          secondaryText: "返回修改",
+          secondaryAction: "close",
+          keepTrip: options.keepTrip
+        });
+        return;
+      }
+      openParentChildSearchSheet(options);
+    }
+
+    function bindRouteButtons() {
+      // Route clicks are delegated through the persona card list because all four cards can render at once.
+    }
+
+    document.querySelector("[data-main-search]").addEventListener("click", () => {
+      activeRoleKey = "business";
+      updatePersonaNavActive();
+      const trip = getMainSearchTrip();
+      currentRoute = `${trip.from} → ${trip.to}`;
+      openSearchSheet();
+    });
+
+    document.querySelectorAll("[data-close-sheet]").forEach((button) => {
+      button.addEventListener("click", requestCloseSheets);
+    });
+
+    document.querySelector("[data-family-action-close]").addEventListener("click", closeSheets);
+    document.querySelector("[data-open-search-passengers]").addEventListener("click", openSearchPassengerSheet);
+    document.querySelector("[data-search-passenger-close]").addEventListener("click", () => {
+      searchPassengerSheet.classList.remove("open");
+    });
+    document.querySelector("[data-search-passenger-list]").addEventListener("click", (event) => {
+      const editButton = event.target.closest("[data-search-passenger-edit]");
+      if (editButton) {
+        event.stopPropagation();
+        showToast("乘机人资料编辑后续接入");
+        return;
+      }
+      const option = event.target.closest("[data-search-passenger]");
+      if (!option) return;
+      toggleSearchPassenger(option.dataset.searchPassenger);
+    });
+    document.querySelector("[data-search-passenger-more]").addEventListener("click", () => {
+      showToast("更多乘机人列表后续接入");
+    });
+    document.querySelector("[data-search-passenger-confirm]").addEventListener("click", () => {
+      selectedSearchPassengerIds = [...draftSearchPassengerIds];
+      renderSearchPassengerSummary();
+      searchPassengerSheet.classList.remove("open");
+      showToast(selectedSearchPassengerIds.length ? "已选择乘机人" : "已清空乘机人选择");
+    });
+    document.querySelector("[data-passenger-picker-close]").addEventListener("click", () => {
+      passengerPickerSheet.classList.remove("open");
+      passengerPickerContext = null;
+    });
+    document.querySelector("[data-passenger-new]").addEventListener("click", () => {
+      showToast("已跳转乘机人新增页（示意），保存后会同步回本次成员");
+    });
+    document.querySelectorAll("[data-passenger-choice]").forEach((button) => {
+      button.addEventListener("click", () => applyPassengerChoice(button.dataset.passengerChoice));
+    });
+    familyActionSecondary.addEventListener("click", () => {
+      const action = familyActionSecondary.dataset.action || "search";
+      const keepTrip = familyActionSecondary.dataset.keepTrip === "true";
+      familyActionSheet.classList.remove("open");
+      if (action === "search") openParentChildSearchSheet({ keepTrip });
+    });
+    familyActionPrimary.addEventListener("click", () => {
+      const action = familyActionPrimary.dataset.action || "manager";
+      const targetSection = familyActionPrimary.dataset.targetSection || "members";
+      const keepTrip = familyActionPrimary.dataset.keepTrip === "true";
+      familyActionSheet.classList.remove("open");
+      if (action === "search") {
+        openParentChildSearchSheet({ keepTrip });
+        return;
+      }
+      if (action === "addAdult") {
+        openRoleManager("parentChild", "members");
+        openPassengerPicker("adult");
+        return;
+      }
+      openRoleManager("parentChild", targetSection);
+    });
+
+    document.querySelectorAll(".sheet-mask").forEach((mask) => {
+      mask.addEventListener("click", (event) => {
+        if (event.target !== mask) return;
+        if (mask === editorSheet) {
+          requestCloseSheets();
+          return;
+        }
+        if (mask === passengerPickerSheet) {
+          passengerPickerSheet.classList.remove("open");
+          passengerPickerContext = null;
+          return;
+        }
+        if (mask === searchPassengerSheet) {
+          searchPassengerSheet.classList.remove("open");
+          return;
+        }
+        closeSheets();
+      });
+    });
+
+    bindRouteButtons();
+
+    document.querySelectorAll("[data-role-tab]").forEach((button) => {
+      button.addEventListener("click", () => setRole(button.dataset.roleTab));
+    });
+
+    personaCardList.addEventListener("click", (event) => {
+      const card = event.target.closest("[data-persona-card]");
+      if (!card) return;
+      const roleKey = card.dataset.personaCard;
+      activeRoleKey = roleKey;
+      updatePersonaNavActive();
+      updateRoleHash(roleKey);
+
+      if (roleKey === "business") {
+        if (event.target.closest("[data-open-editor]")) {
+          openProfileEditor();
+          return;
+        }
+        if (event.target.closest("[data-more-pref]")) {
+          openProfileEditor("prefs");
+          return;
+        }
+        const routeButton = event.target.closest("[data-route]");
+        if (routeButton) {
+          card.querySelectorAll("[data-route]").forEach((item) => item.classList.remove("active"));
+          routeButton.classList.add("active");
+          currentRoute = routeButton.dataset.route;
+          openSearchSheet();
+          return;
+        }
+        if (event.target.closest("[data-open-search]")) {
+          currentRoute = savedProfile.defaultRoute;
+          card.querySelectorAll("[data-route]").forEach((item) => item.classList.remove("active"));
+          const activeRoute = card.querySelector(`[data-route="${savedProfile.defaultRoute}"]`);
+          if (activeRoute) activeRoute.classList.add("active");
+          openSearchSheet();
+          return;
+        }
+      }
+
+      if (event.target.closest("[data-more-pref]")) {
+        openRoleManager(roleKey, "prefs");
+        return;
+      }
+      const managerButton = event.target.closest("[data-open-role-manager]");
+      if (managerButton) {
+        openRoleManager(roleKey);
+        return;
+      }
+      const readyTarget = event.target.closest("[data-role-ready-target]");
+      if (readyTarget) {
+        openRoleManager(roleKey, readyTarget.dataset.roleReadyTarget);
+        return;
+      }
+      if (event.target.closest("[data-family-ticket-summary]")) {
+        openRoleManager("parentChild", "members");
+        return;
+      }
+      const familyDeal = event.target.closest("[data-family-deal-route]");
+      if (familyDeal) {
+        applyFamilyRoute(familyDeal.dataset.familyDealRoute, familyDeal.dataset.familyDealDate);
+        handleParentChildSearch({ keepTrip: true });
+        return;
+      }
+      const routeButton = event.target.closest("[data-role-route]");
+      if (routeButton) {
+        card.querySelectorAll("[data-role-route]").forEach((item) => item.classList.remove("active"));
+        routeButton.classList.add("active");
+        if (roleKey === "parentChild") {
+          applyFamilyRoute(routeButton.dataset.roleRoute);
+          handleParentChildSearch({ keepTrip: true });
+          return;
+        }
+        currentRoute = routeButton.dataset.roleRoute;
+        openSearchSheet();
+        if (routeButton.dataset.dealDate) {
+          selectedDate = routeButton.dataset.dealDate;
+          travelDate.textContent = selectedDate;
+          if (roleKey === "elderly") {
+            const { origin, destination } = parseRoute(currentRoute);
+            roleProfiles.elderly.elderly.currentTrip = { from: origin, to: destination, date: selectedDate };
+          }
+        }
+        return;
+      }
+      if (event.target.closest("[data-role-search]")) {
+        if (roleKey === "parentChild") {
+          handleParentChildSearch();
+          return;
+        }
+        const profile = roleProfiles[roleKey];
+        currentRoute = profile.deals?.[0]?.route || profile.elderly?.deals?.[0]?.route || profile.routes?.[0] || currentRoute;
+        openSearchSheet();
+      }
+    });
+
+    document.querySelector("[data-edit-passenger]").addEventListener("click", () => {
+      showToast("本人资料编辑功能后续接入");
+    });
+
+    document.querySelector("[data-edit-invoice]").addEventListener("click", () => {
+      showToast("报销资料编辑功能后续接入");
+    });
+
+    document.querySelector("[data-voucher-toggle]").addEventListener("click", () => {
+      draftProfile.voucherEnabled = !draftProfile.voucherEnabled;
+      renderEditorDraft();
+    });
+
+    document.querySelector("[data-companion-a]").addEventListener("click", () => {
+      draftProfile.companionASelected = !draftProfile.companionASelected;
+      renderEditorDraft();
+    });
+
+    document.querySelector("[data-companion-b]").addEventListener("click", () => {
+      draftProfile.companionBSelected = !draftProfile.companionBSelected;
+      renderEditorDraft();
+    });
+
+    document.querySelector("[data-add-companion]").addEventListener("click", () => {
+      showToast("后续接入常用乘机人列表");
+    });
+
+    document.querySelectorAll("[data-edit-companion]").forEach((button) => {
+      button.addEventListener("click", () => showToast("同行资料编辑功能后续接入"));
+    });
+
+    document.querySelector("[data-flight-pref-grid]").addEventListener("click", (event) => {
+      const card = event.target.closest("[data-flight-pref]");
+      if (!card) return;
+      const pref = card.dataset.flightPref;
+      draftProfile.flightPreferences = draftProfile.flightPreferences.includes(pref)
+        ? draftProfile.flightPreferences.filter((item) => item !== pref)
+        : [...draftProfile.flightPreferences, pref];
+      renderEditorDraft();
+    });
+
+    document.querySelectorAll("[data-editor-route]").forEach((button) => {
+      button.addEventListener("click", () => {
+        draftProfile.defaultRoute = button.dataset.editorRoute;
+        draftProfile.routes = [
+          draftProfile.defaultRoute,
+          ...draftProfile.routes.filter((route) => route !== draftProfile.defaultRoute)
+        ];
+        renderEditorDraft();
+      });
+    });
+
+    document.querySelector("[data-add-route]").addEventListener("click", () => {
+      showToast("后续接入常飞航线管理");
+    });
+
+    document.querySelector("[data-editor-save]").addEventListener("click", () => {
+      saveProfileDraft();
+      closeSheets();
+      showToast("已保存，下次订票将自动使用");
+    });
+
+    function rerenderRoleManagerSection(targetSection) {
+      renderRoleManager(activeManagerRole);
+      if (!targetSection) return;
+      const target = roleSheetBody.querySelector(`[data-family-section="${targetSection}"]`);
+      if (target) target.scrollIntoView({ block: "start" });
+    }
+
+    function getPassengerChoice(choice) {
+      const profiles = {
+        elderly: { name: "李桂英", docType: "身份证", docNo: "110101195205151234", birthDate: "" },
+        adult: { name: "张伟", docType: "身份证", docNo: "110101198806261234", birthDate: "" },
+        child: { name: "张小宝", docType: "身份证", docNo: "110101202105151234", birthDate: "" },
+        infant: { name: "张小萌", docType: "出生证明", docNo: "出生证明20260620A", birthDate: "" }
+      };
+      return profiles[choice] || profiles.child;
+    }
+
+    function openPassengerPicker(intent, memberId = null) {
+      passengerPickerContext = { intent, memberId };
+      const pickerRole = roleDraft?.kind || "parentChild";
+      document.querySelectorAll("[data-passenger-choice]").forEach((button) => {
+        const matchesRole = button.dataset.pickerRole === pickerRole;
+        const matchesIntent = pickerRole !== "parentChild" || intent !== "adult" || button.dataset.passengerChoice === "adult";
+        button.hidden = !matchesRole || !matchesIntent;
+        button.classList.toggle("recommended", matchesRole && intent === button.dataset.passengerChoice);
+      });
+      if (passengerPickerCopy) {
+        passengerPickerCopy.textContent = pickerRole === "parentChild"
+          ? intent === "adult"
+            ? "儿童/婴儿乘机需有成人同行，先从常用乘机人中添加成人。"
+            : "从常用乘机人中选择成人、儿童或婴儿，系统会按证件信息提示票型。"
+          : "从常用乘机人中选择长辈，资料返回后提示出行材料。";
+      }
+      openSheet(passengerPickerSheet);
+    }
+
+    function applyPassengerChoice(choice) {
+      if (!roleDraft || !passengerPickerContext) return;
+      const selected = getPassengerChoice(choice);
+      if (roleDraft.kind === "elderly") {
+        if (passengerPickerContext.memberId) {
+          const traveler = roleDraft.elderly.travelers.find((item) => item.id === passengerPickerContext.memberId);
+          if (traveler) Object.assign(traveler, selected, { ready: Boolean(getMemberBirthDate(selected)) });
+        } else {
+          roleDraft.elderly.travelers.push({
+            id: `elder-${Date.now()}`,
+            ...selected,
+            ready: Boolean(getMemberBirthDate(selected))
+          });
+        }
+        passengerPickerSheet.classList.remove("open");
+        passengerPickerContext = null;
+        renderRoleManager(activeManagerRole);
+        const target = roleSheetBody.querySelector('[data-family-section="elderly-members"]');
+        if (target) target.scrollIntoView({ block: "start" });
+        showToast("已从常用乘机人页面同步长辈资料");
+        return;
+      }
+      if (roleDraft.kind !== "parentChild") return;
+      if (passengerPickerContext.intent === "adult" && choice !== "adult") {
+        showToast("请先添加同行成人");
+        return;
+      }
+      let changedMemberId = passengerPickerContext.memberId;
+      if (passengerPickerContext.memberId) {
+        const member = roleDraft.family.members.find((item) => item.id === passengerPickerContext.memberId);
+        if (member) Object.assign(member, selected);
+      } else {
+        changedMemberId = `${choice}-${Date.now()}`;
+        roleDraft.family.members.push({
+          id: changedMemberId,
+          ...selected,
+          ready: false
+        });
+        roleDraft.family.selectedMemberId = changedMemberId;
+      }
+      refreshFamilyDerived(roleDraft);
+      const changedMember = roleDraft.family.members.find((member) => member.id === changedMemberId);
+      const changedInfo = changedMember ? calculateMemberTicketInfo(changedMember, roleDraft.family) : null;
+      passengerPickerSheet.classList.remove("open");
+      passengerPickerContext = null;
+      renderRoleManager(activeManagerRole);
+      const target = roleSheetBody.querySelector('[data-family-section="members"]');
+      if (target) target.scrollIntoView({ block: "start" });
+      if (changedInfo?.type === "infant") {
+        showToast("已添加婴儿成员，婴儿出行贴士已更新");
+      } else if (changedInfo?.type === "child") {
+        showToast("已添加儿童成员，票型已自动提示");
+      } else if (changedInfo?.type === "adult") {
+        showToast("已添加同行成人");
+      } else {
+        showToast("已从常用乘机人页面同步成员资料");
+      }
+    }
+
+    function syncFamilyMemberFromPassenger(memberId) {
+      openPassengerPicker("edit", memberId);
+    }
+
+    roleSheetBody.addEventListener("click", (event) => {
+      const memberDelete = event.target.closest("[data-family-member-delete]");
+      if (memberDelete && roleDraft?.kind === "parentChild") {
+        event.stopPropagation();
+        roleDraft.family.members = roleDraft.family.members.filter((member) => member.id !== memberDelete.dataset.familyMemberDelete);
+        refreshFamilyDerived(roleDraft);
+        rerenderRoleManagerSection("members");
+        return;
+      }
+      const memberEditor = event.target.closest("[data-family-member-sync]");
+      if (memberEditor && roleDraft?.kind === "parentChild") {
+        syncFamilyMemberFromPassenger(memberEditor.dataset.familyMemberSync);
+        return;
+      }
+      const familyAdd = event.target.closest("[data-family-add-member]");
+      if (familyAdd && roleDraft?.kind === "parentChild") {
+        openPassengerPicker(familyAdd.dataset.familyAddMember);
+        return;
+      }
+      const elderlyDelete = event.target.closest("[data-elderly-member-delete]");
+      if (elderlyDelete && roleDraft?.kind === "elderly") {
+        event.stopPropagation();
+        roleDraft.elderly.travelers = roleDraft.elderly.travelers.filter((item) => item.id !== elderlyDelete.dataset.elderlyMemberDelete);
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      const elderlyMember = event.target.closest("[data-elderly-member-sync]");
+      if (elderlyMember && roleDraft?.kind === "elderly") {
+        openPassengerPicker("elderly", elderlyMember.dataset.elderlyMemberSync);
+        return;
+      }
+      if (event.target.closest("[data-elderly-add]") && roleDraft?.kind === "elderly") {
+        openPassengerPicker("elderly");
+        return;
+      }
+      const elderlyBookingMode = event.target.closest("[data-elderly-booking-mode]");
+      if (elderlyBookingMode && roleDraft?.kind === "elderly") {
+        roleDraft.elderly.bookingMode = elderlyBookingMode.dataset.elderlyBookingMode;
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      if (event.target.closest("[data-elderly-senior-mode-toggle]") && roleDraft?.kind === "elderly") {
+        roleDraft.elderly.seniorMode = !roleDraft.elderly.seniorMode;
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      if (event.target.closest("[data-elderly-notify-edit]") && roleDraft?.kind === "elderly") {
+        showToast("后续接入行程通知人设置");
+        return;
+      }
+      const elderlyService = event.target.closest("[data-elderly-service]");
+      if (elderlyService && roleDraft?.kind === "elderly") {
+        const service = roleDraft.elderly.services.find((item) => item.key === elderlyService.dataset.elderlyService);
+        if (service) service.selected = !service.selected;
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      const elderlySync = event.target.closest("[data-elderly-sync-toggle]");
+      if (elderlySync && roleDraft?.kind === "elderly") {
+        const key = elderlySync.dataset.elderlySyncToggle;
+        roleDraft.elderly.sync[key] = !roleDraft.elderly.sync[key];
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      if (event.target.closest("[data-elderly-contact]") && roleDraft?.kind === "elderly") {
+        showToast("后续接入行程通知人设置");
+        return;
+      }
+      if (event.target.closest("[data-family-tips-confirm]") && roleDraft?.kind === "parentChild") {
+        roleDraft.family.tipsAcknowledged = true;
+        roleProfiles.parentChild.family.tipsAcknowledged = true;
+        renderPersonaCards();
+        renderRoleManager(activeManagerRole);
+        const target = roleSheetBody.querySelector('[data-family-section="family-tips"]');
+        if (target) target.scrollIntoView({ block: "start" });
+        showToast("已确认带娃出行须知");
+        return;
+      }
+      const prefCard = event.target.closest("[data-role-pref]");
+      if (prefCard && roleDraft) {
+        const pref = roleDraft.prefs.find((item) => item.key === prefCard.dataset.rolePref);
+        if (pref) pref.selected = !pref.selected;
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      const routeButton = event.target.closest("[data-role-manager-route]");
+      if (routeButton && roleDraft) {
+        roleDraft.routes = [
+          routeButton.dataset.roleManagerRoute,
+          ...roleDraft.routes.filter((route) => route !== routeButton.dataset.roleManagerRoute)
+        ];
+        const defaultSummary = roleDraft.summary.find((item) => item[0] === "默认航线");
+        if (defaultSummary) defaultSummary[1] = roleDraft.routes[0];
+        renderRoleManager(activeManagerRole);
+        return;
+      }
+      if (event.target.closest("[data-role-toggle]")) {
+        const toggle = event.target.closest("[data-role-toggle]");
+        const next = toggle.getAttribute("aria-pressed") !== "true";
+        toggle.setAttribute("aria-pressed", String(next));
+        return;
+      }
+      if (event.target.closest("[data-role-placeholder]")) {
+        showToast("此处为资料管理示意，后续接入完整管理能力");
+      }
+    });
+
+    document.querySelector("[data-role-save]").addEventListener("click", () => {
+      let saveToast = "已保存，下次订票会参考当前设置";
+      if (activeManagerRole && roleDraft) {
+        if (roleDraft.kind === "parentChild") {
+          refreshFamilyDerived(roleDraft);
+          roleDraft.family.preferences = roleDraft.prefs.filter((item) => item.selected).map((item) => item.key);
+          const capacity = validateFamilyCapacity(roleDraft);
+          saveToast = capacity.kind === "missingAdult"
+            ? "已保存草稿。儿童/婴儿乘机需有成人陪同，建议添加同行成人"
+            : "已保存，下次带娃订票会优先使用这些设置";
+        }
+        roleProfiles[activeManagerRole] = cloneRoleProfile(roleDraft);
+        renderPersonaCards();
+      }
+      closeSheets();
+      showToast(saveToast);
+    });
+
+    document.querySelector("[data-swap-route]").addEventListener("click", () => {
+      const nextOrigin = destinationCity.textContent;
+      const nextDestination = originCity.textContent;
+      renderRoute(`${nextOrigin} → ${nextDestination}`);
+    });
+
+    document.querySelectorAll("[data-city-field]").forEach((button) => {
+      button.addEventListener("click", () => showToast("城市选择器示意：后续接入现有城市选择"));
+    });
+
+    document.querySelector("[data-date-picker]").addEventListener("click", () => {
+      selectedDate = selectedDate === "5月15日 周五" ? "5月16日 周六" : "5月15日 周五";
+      travelDate.textContent = selectedDate;
+    });
+
+    document.querySelectorAll("[data-trip-type]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-trip-type]").forEach((item) => item.classList.remove("active"));
+        button.classList.add("active");
+      });
+    });
+
+    document.querySelector("[data-confirm-search]").addEventListener("click", () => {
+      closeSheets();
+      if (activeRoleKey === "business") {
+        showToast("将进入航班列表，并按商旅偏好优先排序；确认页会自动使用乘机人与报销信息");
+      } else {
+        showToast("将进入航班列表，搜索时会参考当前出行偏好");
+      }
+    });
+
+    document.querySelectorAll("[data-more-toggle]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const nextOpen = !phone.classList.contains("more-open");
+        phone.classList.toggle("more-open", nextOpen);
+        document.querySelectorAll("[data-more-toggle]").forEach((toggle) => {
+          toggle.setAttribute("aria-expanded", String(nextOpen));
+        });
+        moreLabel.textContent = nextOpen ? "收起" : "更多";
+      });
+    });
+
+    document.querySelectorAll(".quick-tools button, .airline-item, .more-grid button").forEach((item) => {
+      item.addEventListener("click", () => showToast("此处为一级 UE 示意，后续由对应模块承接"));
+    });
+
+    renderSearchPassengerSummary();
+    renderHomeProfile();
+    if (!window.location.hash) {
+      updateRoleHash("business", true);
+    }
+    applyRoleFromHash();
+    window.addEventListener("hashchange", applyRoleFromHash);
+    window.addEventListener("popstate", applyRoleFromHash);
+  </script>
+</body>
+</html>
